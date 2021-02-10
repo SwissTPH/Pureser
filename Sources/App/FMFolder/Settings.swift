@@ -44,6 +44,9 @@ struct Settings {
 		/// Whether to display `SurveyItem` relevance.
 		static var itemRelevance: Bool = true
 
+
+		/// Whether to enable form files conversion logging.
+		static var fileConversionLog: Bool = true
 	}
 
 

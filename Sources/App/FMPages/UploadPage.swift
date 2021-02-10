@@ -175,6 +175,14 @@ struct UploadPage {
 								input(class: "s-input", id: "", type: "submit", value: "Convert!")
 							}
 						}
+
+						if Settings.Feature.fileConversionLog {
+							div(style: "margin-top: 45pt;") {
+								a(href: "/history/", target: "_blank", title: "Form Files Conversion History") {
+									"Form Files Conversion History"
+								}
+							}
+						}
 					}
 					//--------------------------------------------------
 

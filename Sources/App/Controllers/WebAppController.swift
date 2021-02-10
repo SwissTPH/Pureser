@@ -43,6 +43,13 @@ struct WebAppController: RouteCollection {
 
 		//--------------------------------------------------
 
+		if Settings.Feature.fileConversionLog {
+			// GET /history/
+			rb.get("history", use: self.fileConversionLogPageHandler)
+		}
+
+		//--------------------------------------------------
+
 		rb.group("debug") { rb in
 			// GET & POST /debug/crp/
 			rb.get("crp", use: self.debugConvertedResultPageHandler)
@@ -110,25 +117,67 @@ struct WebAppController: RouteCollection {
 		print(#"File attached filename: "\#(filename)"."#)
 
 		//
-		let sheets: SheetsParser
-		do {
-			sheets = try SheetsParser(fileData: fileData, filename: filename)
-		} catch CoreXLSXError.dataIsNotAnArchive {
-			throw Abort(.badRequest, reason: "No valid XLSX file attached.")
-		} catch let error where error is SheetsParser.ParsingError {
-			throw error
-		} catch let error {
-			print(error)
-			throw Abort(.badRequest, reason: "Error: 120/21-12. XLSX file cannot be parsed.")
-		}
+		let survey: Survey = try {
 
-		//
-		let survey: Survey
-		do {
-			survey = try SurveyParser.parseIntoSurvey(using: sheets)
-		} catch let error {
-			throw error
-		}
+			//
+			let fileConversionLogEntry: FileConversionLog = FileConversionLog(
+				filename: filename,
+				fileChecksum: .init(fileData: fileData),
+				conversionPrintVersion: .init(uploadPageFormData.printVersion)
+			)
+			defer {
+				fileConversionLogEntry.conversionEndDatetime = Date()
+				if Settings.Feature.fileConversionLog {
+					_ = fileConversionLogEntry.save(on: req.db)
+				}
+			}
+
+			//
+			let sheets: SheetsParser
+			do {
+				sheets = try SheetsParser(fileData: fileData, filename: filename)
+			} catch CoreXLSXError.dataIsNotAnArchive {
+				let errorDescription = "No valid XLSX file attached."
+
+				//
+				fileConversionLogEntry.conversionStatus = .failure
+				fileConversionLogEntry.conversionFailureErrors.append(errorDescription)
+
+				throw Abort(.badRequest, reason: errorDescription)
+			} catch let error where error is SheetsParser.ParsingError {
+				//
+				fileConversionLogEntry.conversionStatus = .failure
+				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
+
+				throw error
+			} catch let error {
+				//
+				fileConversionLogEntry.conversionStatus = .failure
+				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
+
+				print(error)
+				throw Abort(.badRequest, reason: "Error: 120/21-12. XLSX file cannot be parsed.")
+			}
+
+			//
+			let survey: Survey
+			do {
+				survey = try SurveyParser.parseIntoSurvey(using: sheets)
+			} catch let error {
+				//
+				fileConversionLogEntry.conversionStatus = .failure
+				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
+
+				throw error
+			}
+
+			//
+			fileConversionLogEntry.conversionStatus = .success
+			fileConversionLogEntry.conversionSuccessNotices.append(contentsOf: [])
+
+			//
+			return survey
+		}()
 
 		//
 		return ConvertedDocumentPage(survey: survey, uploadPageFormData: uploadPageFormData).htmlResponse()
@@ -138,6 +187,32 @@ struct WebAppController: RouteCollection {
 
 	func downloadConvertedDocumentPagePostHandler(_ req: Request) throws -> Response {
 		return req.redirect(to: "/")
+	}
+
+	//--------------------------------------------------
+
+	// MARK: fileConversionLog Page
+
+	func fileConversionLogPageHandler(_ req: Request) throws -> EventLoopFuture<Response> {
+
+		let queryRequestLimit: Int = 100
+
+		let dbr = FileConversionLog.DatabaseRepository(database: req.db)
+		let fileConversionLogCount = dbr.count()
+		return fileConversionLogCount.flatMap {
+			(fileConversionLogCount: Int) -> EventLoopFuture<Response> in
+
+			let fileConversionLog = dbr.mostRecent(queryRequestLimit)
+			return fileConversionLog.map {
+				(fileConversionLog: [FileConversionLog]) -> Response in
+
+				return FileConversionLogPage(
+					fileConversionLog: fileConversionLog,
+					totalCountOfFilesConverted: fileConversionLogCount,
+					queryRequestLimit: queryRequestLimit
+				).htmlResponse()
+			}
+		}
 	}
 
 	//--------------------------------------------------
