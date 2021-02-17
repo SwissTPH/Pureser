@@ -7,7 +7,6 @@
 
 import Foundation
 import CoreXLSX
-import Vapor
 
 // MARK: - CoreXLSX extensions
 
