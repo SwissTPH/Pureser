@@ -8,6 +8,7 @@
 import Foundation
 import PrintMore
 //import HTML
+import SurveyTypes
 
 //--------------------------------------------------
 
@@ -22,7 +23,7 @@ public struct SurveyParser {
 	}
 
 	//
-	private static let debug: Bool = Settings.debug
+	private static let debug: Bool = false // Settings.debug
 
 	//
 	public static func parseIntoSurvey(using sheets: SheetsParser) throws -> Survey {
@@ -102,10 +103,7 @@ public struct SurveyParser {
 				let groupType: SurveyGroupType = typeFull == "begin repeat" ? .repeatTable : .basic
 
 				//
-				var surveyGroupName = survaySheetRow.name ?? ""
-				if surveyGroupName.isEmpty {
-					surveyGroupName = Placeholders.untitledGroupName
-				}
+				var surveyGroupName = survaySheetRow.name
 
 				//
 				var surveyGroupLabel = surveyItemLabel
@@ -324,25 +322,22 @@ public struct SurveyParser {
 
 		//--------------------------------------------------
 
-		let surveyTitle = sheets.actualSettings.formTitle ?? Placeholders.untitledSurvey
+		let surveyTitle = sheets.actualSettings.formTitle
 
-		let surveyVersion = sheets.actualSettings.version ?? Placeholders.unknownSurveyVersion
+		let surveyVersion = sheets.actualSettings.version
 
-		let surveyFormID = sheets.actualSettings.formID ?? Placeholders.unknownSurveyFormID
+		let surveyFormID = sheets.actualSettings.formID
 
-		let surveyStyle = sheets.actualSettings.style ?? Placeholders.unknownSurveyStyle
+		let surveyStyle = sheets.actualSettings.style
 
-		let surveyDefaultLanguage: Survey.DatumLanguage =
+		let surveyDefaultLanguage: Survey.DatumLanguage? =
 			sheets.languagesAvailable.all.first { language in
 				language.languageLabel == sheets.actualSettings.defaultLanguage
 			}
 			?? sheets.languagesAvailable.all.first
-			?? Survey.DatumLanguage(
-				languageStringID: "unknown",
-				languageLabel: Placeholders.unknownSurveyDefaultLanguage
-			)
+			?? nil
 
-		let surveyInstanceName = sheets.actualSettings.instanceName ?? Placeholders.unknownSurveyInstanceName
+		let surveyInstanceName = sheets.actualSettings.instanceName
 
 		//--------------------------------------------------
 

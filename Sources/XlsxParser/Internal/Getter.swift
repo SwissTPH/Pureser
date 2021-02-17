@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreXLSX
+import struct SurveyTypes.Survey
 
 internal struct Getter {
 

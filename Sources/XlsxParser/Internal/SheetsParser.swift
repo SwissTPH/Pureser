@@ -8,6 +8,7 @@
 import Foundation
 import PrintMore
 import CoreXLSX
+import struct SurveyTypes.Survey
 
 //
 //

@@ -21,6 +21,26 @@ extension Survey {
 			public var inCommon: [Survey.DatumLanguage]
 			public var inGroupsAndQuestions: [Survey.DatumLanguage]
 			public var inSelectionAnswers: [Survey.DatumLanguage]
+
+
+			public init(
+				inCommon: [Survey.DatumLanguage],
+				inGroupsAndQuestions: [Survey.DatumLanguage],
+				inSelectionAnswers: [Survey.DatumLanguage]
+			) {
+				self.inCommon = inCommon
+				self.inGroupsAndQuestions = inGroupsAndQuestions
+				self.inSelectionAnswers = inSelectionAnswers
+			}
+		}
+
+
+		public init(
+			all: [Survey.DatumLanguage],
+			forLabelCluster: Survey.LanguagesAvailable.ForLabelCluster
+		) {
+			self.all = all
+			self.forLabelCluster = forLabelCluster
 		}
 
 	}
@@ -32,8 +52,17 @@ extension Survey {
 extension Survey {
 
 	public struct DatumLanguage: Codable {
-		var languageStringID: String /// Make sure `LocalizedDatum.languageStringID` has the same type.
-		var languageLabel: String /// Make sure `LocalizedDatum.languageLabel` has the same type.
+		public var languageStringID: String /// Make sure `LocalizedDatum.languageStringID` has the same type.
+		public var languageLabel: String /// Make sure `LocalizedDatum.languageLabel` has the same type.
+
+
+		public init(
+			languageStringID: String,
+			languageLabel: String
+		) {
+			self.languageStringID = languageStringID
+			self.languageLabel = languageLabel
+		}
 	}
 
 }
@@ -57,16 +86,25 @@ extension Survey {
 
 	public struct LocalizedDatum: Codable {
 
-		var datumLanguage: DatumLanguage
+		public var datumLanguage: DatumLanguage
 
 		@available(*, deprecated, renamed: "datumLanguage.languageStringID")
-		var languageStringID: String /// Must be same type as `DatumLanguage.languageStringID`.
+		public var languageStringID: String /// Must be same type as `DatumLanguage.languageStringID`.
 		{ datumLanguage.languageStringID }
 		@available(*, deprecated, renamed: "datumLanguage.languageLabel")
-		var languageLabel: String /// Must be same type as `DatumLanguage.languageLabel`.
+		public var languageLabel: String /// Must be same type as `DatumLanguage.languageLabel`.
 		{ datumLanguage.languageLabel }
 
-		var translation: String?
+		public var translation: String?
+
+
+		public init(
+			datumLanguage: Survey.DatumLanguage,
+			translation: String? = nil
+		) {
+			self.datumLanguage = datumLanguage
+			self.translation = translation
+		}
 	}
 
 }

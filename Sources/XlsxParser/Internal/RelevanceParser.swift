@@ -8,6 +8,7 @@
 import Foundation
 //import PrintMore
 import HTML
+import SurveyTypes
 
 
 // MARK: - RelevanceParser

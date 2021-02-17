@@ -11,7 +11,7 @@ import Foundation
 
 // MARK: - SurveyItemProtocol
 
-protocol SurveyItemProtocol: Codable {
+public protocol SurveyItemProtocol: Codable {
 	var relevance: String? { get }
 	var relevanceStepByStep: [String] { get } // for debugging
 	var relevanceUnprocessed: String? { get }

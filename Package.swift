@@ -33,10 +33,44 @@ let package = Package(
 		//--------------------------------------------------
     ],
     targets: [
+        .target(name: "SurveyTypes", dependencies: []),
+        .target(name: "XlsxParser", dependencies: [
+            //--------------------------------------------------
+
+            .target(name: "SurveyTypes"),
+
+            //--------------------------------------------------
+
+            .product(name: "Vapor", package: "vapor"),
+
+            //--------------------------------------------------
+
+            "PrintMore",
+
+            //--------------------------------------------------
+
+            "CryptoOffice",
+            "CoreXLSX",
+
+            //--------------------------------------------------
+
+            .product(name: "HTML", package: "HTML"),
+
+            //--------------------------------------------------
+
+            "RegEx",
+
+            //--------------------------------------------------
+        ]),
         .target(
             name: "App",
             dependencies: [
 				//--------------------------------------------------
+
+                .target(name: "SurveyTypes"),
+                .target(name: "XlsxParser"),
+
+                //--------------------------------------------------
 
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
@@ -54,10 +88,6 @@ let package = Package(
 				//--------------------------------------------------
 
 				.product(name: "HTML", package: "HTML"),
-
-				//--------------------------------------------------
-
-				"RegEx",
 
 				//--------------------------------------------------
             ],

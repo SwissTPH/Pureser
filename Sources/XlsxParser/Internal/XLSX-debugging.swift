@@ -9,6 +9,7 @@ import Foundation
 import CoreXLSX
 import protocol Vapor.ResponseEncodable
 import protocol Vapor.Content
+import struct SurveyTypes.Survey
 
 // MARK: -
 
@@ -24,7 +25,7 @@ extension CoreXLSX.SharedStrings: Content { }
 extension DebugCoreXLSXFile: Content { }
 extension TestCell: Content { }
 
-struct DebugCoreXLSXFile: Codable {
+public struct DebugCoreXLSXFile: Codable {
 	var workbooks: [CoreXLSX.Workbook]
 	var worksheets: [CoreXLSX.Worksheet]
 	var sharedStrings: CoreXLSX.SharedStrings?
@@ -52,7 +53,7 @@ struct TestCell: Codable {
 
 // MARK: func debugCoreXLSXFile
 
-func debugCoreXLSXFile(fileData: Data) throws -> DebugCoreXLSXFile {
+public func debugCoreXLSXFile(fileData: Data) throws -> DebugCoreXLSXFile {
 	let file = try CoreXLSX.XLSXFile(data: fileData)
 	print("File was read successfully.")
 

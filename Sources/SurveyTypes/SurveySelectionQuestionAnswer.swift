@@ -10,8 +10,17 @@ import Foundation
 //--------------------------------------------------
 
 public struct SurveySelectionQuestionAnswer: Codable {
-	var answerID: String
-	var answerLabel: Survey.LocalizedData
+	public var answerID: String
+	public var answerLabel: Survey.LocalizedData
+
+
+	public init(
+		answerID: String,
+		answerLabel: Survey.LocalizedData
+	) {
+		self.answerID = answerID
+		self.answerLabel = answerLabel
+	}
 }
 
 //--------------------------------------------------

@@ -8,6 +8,8 @@
 import Foundation
 import HTML
 import Vapor
+import SurveyTypes
+import XlsxParser
 
 final class ConvertedDocumentPage {
 
@@ -133,7 +135,7 @@ final class ConvertedDocumentPage {
 						div {
 							if resultsLayoutDisplayOptions.displayGroupsID {
 								span(class: "faded-l") { "[" }
-								span(class: "faded-d") { surveyGroup.name }
+								span(class: "faded-d") { surveyGroup.name ?? Placeholders.untitledGroupName }
 								span(class: "faded-l") { "]" }
 							}
 
@@ -604,7 +606,7 @@ final class ConvertedDocumentPage {
 	) -> Node {
 		nodeContainer {
 			localizedData.map { localizedDatum -> Node in
-				let displayCSS = localizedDatum.languageLabel != survey.defaultLanguage.languageLabel ? "display: none;" : ""
+				let displayCSS = localizedDatum.languageLabel != survey.defaultLanguage?.languageLabel ? "display: none;" : ""
 
 				let translation: String
 				if let _translation = localizedDatum.translation, !_translation.isEmpty {
@@ -1133,7 +1135,7 @@ final class ConvertedDocumentPage {
 											}
 										}
 										survey.languagesInCommonForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
-											let isDefault = language.languageLabel == survey.defaultLanguage.languageLabel
+											let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
 
 											return option(selected: isDefault, value: language.languageStringID) {
 												(isDefault ? "Default - " : "") + language.languageLabel
@@ -1156,7 +1158,7 @@ final class ConvertedDocumentPage {
 												}
 											}
 											survey.languages.map { (language: Survey.DatumLanguage) -> Node in
-												let isDefault = language.languageLabel == survey.defaultLanguage.languageLabel
+												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
 
 												return option(selected: isDefault, value: language.languageStringID) {
 													(isDefault ? "Default - " : "") + language.languageLabel
@@ -1179,7 +1181,7 @@ final class ConvertedDocumentPage {
 												}
 											}
 											survey.languagesInGroupsAndQuestionsForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
-												let isDefault = language.languageLabel == survey.defaultLanguage.languageLabel
+												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
 
 												return option(selected: isDefault, value: language.languageStringID) {
 													(isDefault ? "Default - " : "") + language.languageLabel
@@ -1197,7 +1199,7 @@ final class ConvertedDocumentPage {
 												}
 											}
 											survey.languagesInSelectionAnswersForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
-												let isDefault = language.languageLabel == survey.defaultLanguage.languageLabel
+												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
 
 												return option(selected: isDefault, value: language.languageStringID) {
 													(isDefault ? "Default - " : "") + language.languageLabel
@@ -1212,7 +1214,7 @@ final class ConvertedDocumentPage {
 						div(style: "text-align: center;") {
 							h3(style: "margin: 0 auto;text-decoration: underline;") { "Survey" }
 							h1(style: "margin: 3px auto 5px;") {
-								survey.title
+								survey.title ?? Placeholders.untitledSurvey
 							}
 
 							if resultsLayoutDisplayOptions.displaySurveySettingsAndInfo {
@@ -1221,19 +1223,19 @@ final class ConvertedDocumentPage {
 										tbody {
 											tr {
 												td { "Version" }
-												td { survey.version }
+												td { survey.version ?? Placeholders.unknownSurveyVersion }
 											}
 											tr {
 												td { "Form ID" }
-												td { survey.formID }
+												td { survey.formID ?? Placeholders.unknownSurveyFormID }
 											}
 											tr {
 												td { "Style" }
-												td { survey.style }
+												td { survey.style ?? Placeholders.unknownSurveyStyle }
 											}
 											tr {
 												td { "Default Language" }
-												td { survey.defaultLanguage.languageLabel }
+												td { survey.defaultLanguage?.languageLabel ?? Placeholders.unknownSurveyDefaultLanguage }
 											}
 											if Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster && survey.languagesInCommonForLabelCluster.count > 1 || !Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster && survey.languages.count > 1 {
 												tr {

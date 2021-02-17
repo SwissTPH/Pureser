@@ -8,6 +8,8 @@
 import Foundation
 import Vapor
 import enum CoreXLSX.CoreXLSXError
+import struct SurveyTypes.Survey
+import XlsxParser
 
 struct WebAppController: RouteCollection {
 

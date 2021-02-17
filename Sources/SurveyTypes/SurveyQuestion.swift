@@ -11,32 +11,32 @@ import Foundation
 
 public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
-	var type: SurveyQuestionType
-	var typeFull: String
+	public var type: SurveyQuestionType
+	public var typeFull: String
 
-	var answers: [SurveySelectionQuestionAnswer]
+	public var answers: [SurveySelectionQuestionAnswer]
 
-	var name: String
+	public var name: String
 
-	var label: Survey.LocalizedData
-	var labelFull: Survey.LocalizedData
+	public var label: Survey.LocalizedData
+	public var labelFull: Survey.LocalizedData
 
-	var hint: Survey.LocalizedData
+	public var hint: Survey.LocalizedData
 
-	var relevance: String?
-	var relevanceStepByStep: [String] // for debugging
-	var relevanceUnprocessed: String?
+	public var relevance: String?
+	public var relevanceStepByStep: [String] // for debugging
+	public var relevanceUnprocessed: String?
 
-	//var `required`
-	//var notes
-	//var appearance
-	//var calculation
-	//var `default`
+	//public var `required`
+	//public var notes
+	//public var appearance
+	//public var calculation
+	//public var `default`
 	//
-	//var constraint
-	//var contraint_message // ::English
+	//public var constraint
+	//public var contraint_message // ::English
 	//
-	//var read_only
+	//public var read_only
 
 	public init(
 		type: SurveyQuestionType,
