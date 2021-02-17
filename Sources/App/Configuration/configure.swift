@@ -31,10 +31,21 @@ public func configure(_ app: Application) throws {
 	let psqlConfigFactory: DatabaseConfigurationFactory
 
 	// In case `POSTGRESQL_URL` var is provided by env.
-	if let psqlURL = Environment.get("POSTGRESQL_URL").flatMap(URL.init) {
-		psqlConfigFactory = try! .postgres(url: psqlURL)
+	if
+		let psqlURL = Environment.get("POSTGRESQL_URL").flatMap(URL.init),
+		let _psqlConfigFactory: DatabaseConfigurationFactory = try? .postgres(url: psqlURL)
+	{
+		psqlConfigFactory = _psqlConfigFactory
 	}
 	// In case `DATABASE_URL` var is provided by env (e.g. in case of Heroku for the attached db).
+	else if
+		let psqlURL = Environment.get("DATABASE_URL").flatMap(URL.init),
+		let _psqlConfigFactory: DatabaseConfigurationFactory = try? .postgres(url: psqlURL)
+	{
+		psqlConfigFactory = _psqlConfigFactory
+	}
+	// In case of heroku and Heroku Postgres's standard plan.
+	// Unverified TLS is required if you are using Heroku Postgres's standard plan.
 	else if
 		let databaseURL = Environment.get("DATABASE_URL"),
 		var postgresConfig = PostgresConfiguration(url: databaseURL)
@@ -42,7 +53,7 @@ public func configure(_ app: Application) throws {
 		postgresConfig.tlsConfiguration = .forClient(certificateVerification: .none)
 		psqlConfigFactory = .postgres(configuration: postgresConfig)
 	}
-	// In case db config vars are provided apart (not as URL/URI) by env.
+	// In case db config vars are provided apart (not as URL) by env.
 	else if
 		let psqlHostname = Environment.get("POSTGRESQL_HOST"),
 		let psqlPortString = Environment.get("POSTGRESQL_PORT"),
