@@ -1290,7 +1290,7 @@ final class ConvertedDocumentPage {
 							if survey.languagesInCommonForLabelCluster.count > 1 && Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster {
 
 								div(style: "margin-top: 20px;") {
-									span { "Select survey's language:" }
+									span { "Choose survey's language:" }
 									select(class: "tool-select", id: "select_survey_language") {
 										if survey.languages.count > 1 {
 											option(selected: false, value: "-show-all-") {
