@@ -833,6 +833,42 @@ final class ConvertedDocumentPage {
 
 
 
+	//
+	private func languageChooser(
+		uiText: String,
+		selectInputID: String,
+		languageList: [Survey.DatumLanguage]
+	) -> Node {
+		nodeContainer {
+
+			div(style: "display: inline;") {
+				span { uiText }
+				select(class: "tool-select", id: selectInputID) {
+					if languageList.count > 1 {
+						option(selected: false, value: "-show-all-") {
+							"Show all"
+						}
+					}
+					languageList.map { (language: Survey.DatumLanguage) -> Node in
+						let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
+						let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
+
+						return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
+							(isDefault ? "Default - " : "") + language.languageLabel
+						}
+					}
+				}
+			}
+
+		}
+	}
+
+
+
+	//--------------------------------------------------
+
+
+
 	// MARK: Page HTML
 
 	func pageHTML() -> Node {
@@ -1290,22 +1326,11 @@ final class ConvertedDocumentPage {
 							if survey.languagesInCommonForLabelCluster.count > 1 && Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster {
 
 								div(style: "margin-top: 20px;") {
-									span { "Choose survey's language:" }
-									select(class: "tool-select", id: "select_survey_language") {
-										if survey.languages.count > 1 {
-											option(selected: false, value: "-show-all-") {
-												"Show all"
-											}
-										}
-										survey.languagesInCommonForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
-											let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
-											let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
-
-											return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
-												(isDefault ? "Default - " : "") + language.languageLabel
-											}
-										}
-									}
+									languageChooser(
+										uiText: "Choose survey's language:",
+										selectInputID: "select_survey_language",
+										languageList: survey.languagesInCommonForLabelCluster
+									)
 								}
 
 							}
@@ -1314,22 +1339,11 @@ final class ConvertedDocumentPage {
 									&& survey.languages == survey.languagesInSelectionAnswersForLabelCluster {
 
 									div(style: "margin-top: 20px;") {
-										span { "Choose survey's language:" }
-										select(class: "tool-select", id: "select_survey_language") {
-											if survey.languages.count > 1 {
-												option(selected: false, value: "-show-all-") {
-													"Show all"
-												}
-											}
-											survey.languages.map { (language: Survey.DatumLanguage) -> Node in
-												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
-												let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
-
-												return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
-													(isDefault ? "Default - " : "") + language.languageLabel
-												}
-											}
-										}
+										languageChooser(
+											uiText: "Choose survey's language:",
+											selectInputID: "select_survey_language",
+											languageList: survey.languages
+										)
 									}
 
 								} else {
@@ -1338,41 +1352,19 @@ final class ConvertedDocumentPage {
 										span(style: "display: block;text-decoration: underline;") { "Choose survey's language" }
 										span { "&nbsp;" }
 
-										span { "Groups & questions" }
-										select(class: "tool-select", id: "select_survey_language_sheet1_label") {
-											if survey.languagesInGroupsAndQuestionsForLabelCluster.count > 1 {
-												option(selected: false, value: "-show-all-") {
-													"Show all"
-												}
-											}
-											survey.languagesInGroupsAndQuestionsForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
-												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
-												let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
-
-												return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
-													(isDefault ? "Default - " : "") + language.languageLabel
-												}
-											}
-										}
+										languageChooser(
+											uiText: "Groups & questions",
+											selectInputID: "select_survey_language_sheet1_label",
+											languageList: survey.languagesInGroupsAndQuestionsForLabelCluster
+										)
 
 										br()
 
-										span { "Questions' answers" }
-										select(class: "tool-select", id: "select_survey_language_sheet2_label") {
-											if survey.languagesInSelectionAnswersForLabelCluster.count > 1 {
-												option(selected: false, value: "-show-all-") {
-													"Show all"
-												}
-											}
-											survey.languagesInSelectionAnswersForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
-												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
-												let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
-
-												return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
-													(isDefault ? "Default - " : "") + language.languageLabel
-												}
-											}
-										}
+										languageChooser(
+											uiText: "Questions' answers",
+											selectInputID: "select_survey_language_sheet2_label",
+											languageList: survey.languagesInSelectionAnswersForLabelCluster
+										)
 									}
 
 								} // end if
