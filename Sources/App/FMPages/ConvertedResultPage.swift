@@ -21,6 +21,11 @@ final class ConvertedDocumentPage {
 	//
 	private var resultsLayoutDisplayOptions: ResultsLayoutDisplayOptions
 
+
+	/// Name of the file, excluding extension.
+	private var originalFileNameExcludingExtension: String?
+
+
 	//
 	private var debug: Bool
 
@@ -56,6 +61,20 @@ final class ConvertedDocumentPage {
 			}
 
 			return resultsLayoutDisplayOptions
+		}()
+
+		//
+		self.originalFileNameExcludingExtension = {
+			guard let filename = uploadPageFormData?.xlsxFile.filename else {
+				return nil
+			}
+
+			let parts = filename.split(separator: ".")
+			if parts.count > 1 {
+				return parts.dropLast().joined(separator: ".")
+			} else {
+				return filename
+			}
 		}()
 
 		//
@@ -1137,7 +1156,13 @@ final class ConvertedDocumentPage {
 					meta(charset: "utf-8", content: "text/html", httpEquiv: "Content-Type")
 					meta(content: "en-UK", httpEquiv: "content-language")
 
-					title { FixedText.webAppNamePublic + " / Converted Document" }
+					title {
+						if let filenameExcludingExtension = self.originalFileNameExcludingExtension {
+							filenameExcludingExtension + " (" + FixedText.webAppNamePublic + ")"
+						} else {
+							FixedText.webAppNamePublic + " / Converted Document"
+						}
+					}
 
 
 					style {
