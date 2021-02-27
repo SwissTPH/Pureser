@@ -763,7 +763,7 @@ final class ConvertedDocumentPage {
 	) -> Node {
 		nodeContainer {
 			localizedData.map { localizedDatum -> Node in
-				let displayCSS = localizedDatum.languageLabel != survey.defaultLanguage?.languageLabel ? "display: none;" : ""
+				let displayCSS = localizedDatum.languageLabel != survey.autoDefaultLanguage?.languageLabel ? "display: none;" : ""
 
 				let translation: String
 				if let _translation = localizedDatum.translation, !_translation.isEmpty {
@@ -1299,8 +1299,9 @@ final class ConvertedDocumentPage {
 										}
 										survey.languagesInCommonForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
 											let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
+											let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
 
-											return option(selected: isDefault, value: language.languageStringID) {
+											return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
 												(isDefault ? "Default - " : "") + language.languageLabel
 											}
 										}
@@ -1322,8 +1323,9 @@ final class ConvertedDocumentPage {
 											}
 											survey.languages.map { (language: Survey.DatumLanguage) -> Node in
 												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
+												let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
 
-												return option(selected: isDefault, value: language.languageStringID) {
+												return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
 													(isDefault ? "Default - " : "") + language.languageLabel
 												}
 											}
@@ -1345,8 +1347,9 @@ final class ConvertedDocumentPage {
 											}
 											survey.languagesInGroupsAndQuestionsForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
 												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
+												let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
 
-												return option(selected: isDefault, value: language.languageStringID) {
+												return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
 													(isDefault ? "Default - " : "") + language.languageLabel
 												}
 											}
@@ -1363,8 +1366,9 @@ final class ConvertedDocumentPage {
 											}
 											survey.languagesInSelectionAnswersForLabelCluster.map { (language: Survey.DatumLanguage) -> Node in
 												let isDefault = language.languageLabel == survey.defaultLanguage?.languageLabel
+												let isAutoDefault = language.languageLabel == survey.autoDefaultLanguage?.languageLabel
 
-												return option(selected: isDefault, value: language.languageStringID) {
+												return option(selected: isDefault || isAutoDefault, value: language.languageStringID) {
 													(isDefault ? "Default - " : "") + language.languageLabel
 												}
 											}
@@ -1377,28 +1381,60 @@ final class ConvertedDocumentPage {
 						div(style: "text-align: center;") {
 							h3(style: "margin: 0 auto;text-decoration: underline;") { "Survey" }
 							h1(style: "margin: 3px auto 5px;") {
-								survey.title ?? Placeholders.untitledSurvey
+								survey.formTitle ?? survey.formID ?? self.originalFileNameExcludingExtension ?? Placeholders.untitledSurvey
 							}
 
 							if resultsLayoutDisplayOptions.displaySurveySettingsAndInfo {
 								div(class: "survey-info-con") {
 									table(class: "survey-info") {
 										tbody {
-											tr {
-												td { "Version" }
-												td { survey.version ?? Placeholders.unknownSurveyVersion }
+											if let formTitle = survey.formTitle, false {
+												tr {
+													td { "Form Title" }
+													td { formTitle }
+												}
 											}
-											tr {
-												td { "Form ID" }
-												td { survey.formID ?? Placeholders.unknownSurveyFormID }
+											if let formID = survey.formID {
+												tr {
+													td { "Form ID" }
+													td { formID }
+												}
 											}
-											tr {
-												td { "Style" }
-												td { survey.style ?? Placeholders.unknownSurveyStyle }
+											if let version = survey.version {
+												tr {
+													td { "Version" }
+													td { version }
+												}
 											}
-											tr {
-												td { "Default Language" }
-												td { survey.defaultLanguage?.languageLabel ?? Placeholders.unknownSurveyDefaultLanguage }
+											if let defaultLanguage = survey.defaultLanguage {
+												tr {
+													td { "Default Language" }
+													td { defaultLanguage.languageLabel }
+												}
+											}
+											if let style = survey.style?.rawValue {
+												tr {
+													td { "Style" }
+													td { style }
+												}
+											}
+											if let instanceName = survey.instanceName {
+												tr {
+													td { "Instance Name" }
+													td { instanceName }
+												}
+											}
+											if let publicKey = survey.publicKey {
+												tr {
+													td { "Public Key" }
+													td { publicKey }
+												}
+											}
+											if let submissionURL = survey.submissionURL {
+												tr {
+													td { "Submission URL" }
+													td { submissionURL }
+												}
 											}
 											if Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster && survey.languagesInCommonForLabelCluster.count > 1 || !Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster && survey.languages.count > 1 {
 												tr {

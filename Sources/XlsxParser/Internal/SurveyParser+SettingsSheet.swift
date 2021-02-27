@@ -15,53 +15,65 @@ public struct SettingsSheet {
 
 	struct ColumnsPossibleTitles {
 		//static var formTitle = ["form_title", "form title"]
-		//static var version = ["version"]
 		//static var formID = ["form_id", "form id"]
-		//static var style = ["style"]
+		//static var version = ["version"]
 		//static var defaultLanguage = ["default_language", "default language"]
+		//static var style = ["style"]
 		//static var instanceName = ["instance_name", "instance name"]
+		//static var publicKey = ["public_key", "public key"]
+		//static var submissionURL = ["submission_url", ""submission url""]
 	}
 
 	public struct Row: Codable {
 		var formTitle: String?
-		var version: String?
 		var formID: String?
-		var style: String?
+		var version: String?
 		var defaultLanguage: String?
+		var style: String?
 		var instanceName: String?
+		var publicKey: String?
+		var submissionURL: String?
 
 		enum CodingKeys: String, CodingKey {
 			case formTitle = "form_title"
-			case version = "version"
 			case formID = "form_id"
-			case style = "style"
+			case version = "version"
 			case defaultLanguage = "default_language"
+			case style = "style"
 			case instanceName = "instance_name"
+			case publicKey = "public_key"
+			case submissionURL = "submission_url"
 		}
 
 		internal init(
 			formTitle: String? = nil,
-			version: String? = nil,
 			formID: String? = nil,
-			style: String? = nil,
+			version: String? = nil,
 			defaultLanguage: String? = nil,
-			instanceName: String? = nil
+			style: String? = nil,
+			instanceName: String? = nil,
+			publicKey: String? = nil,
+			submissionURL: String? = nil
 		) {
 			self.formTitle = formTitle
-			self.version = version
 			self.formID = formID
-			self.style = style
+			self.version = version
 			self.defaultLanguage = defaultLanguage
+			self.style = style
 			self.instanceName = instanceName
+			self.publicKey = publicKey
+			self.submissionURL = submissionURL
 		}
 
 		internal var isVacant: Bool {
 			return formTitle?.isEmpty ?? true
-				&& version?.isEmpty ?? true
 				&& formID?.isEmpty ?? true
-				&& style?.isEmpty ?? true
+				&& version?.isEmpty ?? true
 				&& defaultLanguage?.isEmpty ?? true
+				&& style?.isEmpty ?? true
 				&& instanceName?.isEmpty ?? true
+				&& publicKey?.isEmpty ?? true
+				&& submissionURL?.isEmpty ?? true
 		}
 
 		internal var nilIfVacant: Self? {
@@ -71,11 +83,13 @@ public struct SettingsSheet {
 
 	public struct ColumnReferences {
 		var formTitle: CoreXLSX.ColumnReference?
-		var version: CoreXLSX.ColumnReference?
 		var formID: CoreXLSX.ColumnReference?
-		var style: CoreXLSX.ColumnReference?
+		var version: CoreXLSX.ColumnReference?
 		var defaultLanguage: CoreXLSX.ColumnReference?
+		var style: CoreXLSX.ColumnReference?
 		var instanceName: CoreXLSX.ColumnReference?
+		var publicKey: CoreXLSX.ColumnReference?
+		var submissionURL: CoreXLSX.ColumnReference?
 	}
 
 	/// Header row.
@@ -137,17 +151,21 @@ public struct SettingsSheet {
 		//
 		let columnReferences = ColumnReferences(
 
-			formTitle: try getter.findColumnReference(Row.CodingKeys.formTitle.rawValue),
+			formTitle: try? getter.findColumnReference(Row.CodingKeys.formTitle.rawValue),
 
-			version: try getter.findColumnReference(Row.CodingKeys.version.rawValue),
+			formID: try? getter.findColumnReference(Row.CodingKeys.formID.rawValue),
 
-			formID: try getter.findColumnReference(Row.CodingKeys.formID.rawValue),
+			version: try? getter.findColumnReference(Row.CodingKeys.version.rawValue),
+
+			defaultLanguage: try? getter.findColumnReference(Row.CodingKeys.defaultLanguage.rawValue),
 
 			style: try? getter.findColumnReference(Row.CodingKeys.style.rawValue),
 
-			defaultLanguage: try getter.findColumnReference(Row.CodingKeys.defaultLanguage.rawValue),
+			instanceName: try? getter.findColumnReference(Row.CodingKeys.instanceName.rawValue),
 
-			instanceName: try? getter.findColumnReference(Row.CodingKeys.instanceName.rawValue)
+			publicKey: try? getter.findColumnReference(Row.CodingKeys.publicKey.rawValue),
+
+			submissionURL: try? getter.findColumnReference(Row.CodingKeys.submissionURL.rawValue)
 		)
 
 		//
@@ -155,11 +173,13 @@ public struct SettingsSheet {
 			(row: CoreXLSX.Row) -> Row in
 			Row(
 				formTitle: getter.findTrimmedPlainString(in: row, by: columnReferences.formTitle),
-				version: getter.findTrimmedPlainString(in: row, by: columnReferences.version),
 				formID: getter.findTrimmedPlainString(in: row, by: columnReferences.formID),
-				style: getter.findTrimmedPlainString(in: row, by: columnReferences.style),
+				version: getter.findTrimmedPlainString(in: row, by: columnReferences.version),
 				defaultLanguage: getter.findTrimmedPlainString(in: row, by: columnReferences.defaultLanguage),
-				instanceName: getter.findTrimmedPlainString(in: row, by: columnReferences.instanceName)
+				style: getter.findTrimmedPlainString(in: row, by: columnReferences.style),
+				instanceName: getter.findTrimmedPlainString(in: row, by: columnReferences.instanceName),
+				publicKey: getter.findTrimmedPlainString(in: row, by: columnReferences.publicKey),
+				submissionURL: getter.findTrimmedPlainString(in: row, by: columnReferences.submissionURL)
 			)
 		}
 

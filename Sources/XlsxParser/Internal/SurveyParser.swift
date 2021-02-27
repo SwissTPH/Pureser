@@ -323,32 +323,28 @@ public struct SurveyParser {
 
 		//--------------------------------------------------
 
-		let surveyTitle = sheets.actualSettings.formTitle
-
-		let surveyVersion = sheets.actualSettings.version
-
-		let surveyFormID = sheets.actualSettings.formID
-
-		let surveyStyle = sheets.actualSettings.style
-
-		let surveyDefaultLanguage: Survey.DatumLanguage? =
-			sheets.languagesAvailable.all.first { language in
-				language.languageLabel == sheets.actualSettings.defaultLanguage
+		// Original default language of form.
+		// It is `nil` if not present a default language in the settings sheet.
+		// If present, find it in the languages array.
+		let defaultLanguage: Survey.DatumLanguage? =
+			sheets.actualSettings.defaultLanguage.flatMap { defaultLanguage in
+				sheets.languagesAvailable.all.first { language in
+					language.languageLabel == defaultLanguage
+				}
 			}
-			?? sheets.languagesAvailable.all.first
-			?? nil
 
-		let surveyInstanceName = sheets.actualSettings.instanceName
-
-		//--------------------------------------------------
+		let style: Survey.Style? =
+			sheets.actualSettings.style.flatMap { Survey.Style(rawValue: $0) }
 
 		survey = Survey(
-			formTitle: surveyTitle,
-			version: surveyVersion,
-			formID: surveyFormID,
-			style: surveyStyle,
-			defaultLanguage: surveyDefaultLanguage,
-			instanceName: surveyInstanceName,
+			formTitle: sheets.actualSettings.formTitle,
+			formID: sheets.actualSettings.formID,
+			version: sheets.actualSettings.version,
+			defaultLanguage: defaultLanguage,
+			style: style,
+			instanceName: sheets.actualSettings.instanceName,
+			publicKey: sheets.actualSettings.publicKey,
+			submissionURL: sheets.actualSettings.submissionURL,
 
 			languagesAvailable: sheets.languagesAvailable,
 
