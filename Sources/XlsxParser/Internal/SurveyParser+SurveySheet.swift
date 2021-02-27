@@ -112,9 +112,9 @@ public struct SurveySheet {
 	}
 
 	public struct ColumnReferences {
-		var type: CoreXLSX.ColumnReference?
-		var name: CoreXLSX.ColumnReference?
-		var labelCluster: ColumnClusterReference?
+		var type: CoreXLSX.ColumnReference
+		var name: CoreXLSX.ColumnReference
+		var labelCluster: ColumnClusterReference
 		var hintCluster: ColumnClusterReference?
 		var relevant: CoreXLSX.ColumnReference?
 		var required: CoreXLSX.ColumnReference?
@@ -192,21 +192,21 @@ public struct SurveySheet {
 
 			labelCluster: try getter.findColumnReferences(titleContaining: Row.CodingKeys.labelCluster.rawValue),
 
-			hintCluster: try getter.findColumnReferences(titleContaining: Row.CodingKeys.hintCluster.rawValue),
+			hintCluster: try? getter.findColumnReferences(titleContaining: Row.CodingKeys.hintCluster.rawValue),
 
-			relevant: try getter.findColumnReference(Row.CodingKeys.relevant.rawValue),
+			relevant: try? getter.findColumnReference(Row.CodingKeys.relevant.rawValue),
 
-			required: try getter.findColumnReference(Row.CodingKeys.required.rawValue),
+			required: try? getter.findColumnReference(Row.CodingKeys.required.rawValue),
 
 			notes: try? getter.findColumnReference(Row.CodingKeys.notes.rawValue),
 
-			appearance: try getter.findColumnReference(Row.CodingKeys.appearance.rawValue),
+			appearance: try? getter.findColumnReference(Row.CodingKeys.appearance.rawValue),
 
 			calculation: try? getter.findColumnReference(Row.CodingKeys.calculation.rawValue),
 
 			default: try? getter.findColumnReference(Row.CodingKeys.default.rawValue),
 
-			constraint: try getter.findColumnReference(Row.CodingKeys.constraint.rawValue),
+			constraint: try? getter.findColumnReference(Row.CodingKeys.constraint.rawValue),
 
 			constraintMessageCluster: try? getter.findColumnReferences(titleContaining: Row.CodingKeys.constraintMessageCluster.rawValue),
 

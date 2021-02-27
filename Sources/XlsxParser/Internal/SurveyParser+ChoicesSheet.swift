@@ -52,9 +52,9 @@ public struct ChoicesSheet {
 	}
 
 	public struct ColumnReferences {
-		var listName: CoreXLSX.ColumnReference?
-		var name: CoreXLSX.ColumnReference?
-		var labelCluster: ColumnClusterReference?
+		var listName: CoreXLSX.ColumnReference
+		var name: CoreXLSX.ColumnReference
+		var labelCluster: ColumnClusterReference
 	}
 
 	/// Header row.
