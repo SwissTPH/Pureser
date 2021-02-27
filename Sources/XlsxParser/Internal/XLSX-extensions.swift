@@ -32,41 +32,79 @@ extension CoreXLSX.Cell {
 	///
 	func trimmedPlainString(sharedStrings: SharedStrings?) -> String? {
 
-		//guard type == .sharedString else { return nil }
-		guard let sharedStrings = sharedStrings else { return nil }
+		var trimmedPlainString: String? = nil
 
-		let c = self
+		//
+		if let sharedStrings = sharedStrings {
+			let richString: [RichText] = self.richStringValue(sharedStrings)
+			let string: String? = self.stringValue(sharedStrings)
 
-		let string = c.stringValue(sharedStrings)
-		let date = c.dateValue
-		let richString = c.richStringValue(sharedStrings)
-
-		let trimmedPlainString: String?
-
-		if !richString.isEmpty && !richString.allSatisfy({ $0.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true }) {
-			trimmedPlainString = richString.compactMap { $0.text }.joined().trimmingCharacters(in: .whitespacesAndNewlines)
+			//
+			if !richString.isEmpty && !richString.isVacant {
+				trimmedPlainString = richString.compactMap { $0.text }.joined()
+			}
+			//
+			else if let string = string, !string.isEmpty {
+				trimmedPlainString = string
+			}
 		}
-		else if let string = string?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty {
-			trimmedPlainString = string
+		//
+		else if let inlineString = self.inlineString, !inlineString.isVacant {
+			trimmedPlainString = inlineString.text
 		}
-		else if let date = date {
-			trimmedPlainString = String(describing: date)
-		}
-		else {
-			trimmedPlainString = nil
+		//
+		else if let value = self.value, !value.isEmpty {
+			//
+			if let type = self.type, type == .date, let dateValue: Date = self.dateValue {
+				// RFC 3339 DateFormatter
+				let dateFormatter = DateFormatter()
+				dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+				dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+				dateFormatter.dateFormat = "yyyy-MMM-dd HH:mm:ss zzzxxx" // ZZZZ" // ZZZZZ"
+
+				trimmedPlainString = dateFormatter.string(from: dateValue)
+			}
+			//
+			else {
+				trimmedPlainString = value
+			}
 		}
 
-		if let trimmedPlainString = trimmedPlainString, trimmedPlainString.isEmpty {
-			return nil
-		}
+		//
+		trimmedPlainString = trimmedPlainString?.trimmingCharacters(in: .whitespacesAndNewlines)
 
-		return trimmedPlainString
+		//
+		if let trimmedPlainString = trimmedPlainString, !trimmedPlainString.isEmpty {
+			return trimmedPlainString
+		}
+		return nil
 	}
 
 	/// isVacant is true when the `trimmedPlainString` isEmpty or is `nil`.
 	///
 	func isVacant(sharedStrings: SharedStrings?) -> Bool {
 		self.trimmedPlainString(sharedStrings: sharedStrings)?.isEmpty ?? true
+	}
+
+}
+
+
+// MARK: -
+
+fileprivate extension Array where Element == CoreXLSX.RichText {
+
+	var isVacant: Bool {
+		self.allSatisfy({ (richText: RichText) in
+			richText.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
+		})
+	}
+
+}
+
+fileprivate extension CoreXLSX.InlineString {
+
+	var isVacant: Bool {
+		self.text?.isEmpty ?? true
 	}
 
 }
