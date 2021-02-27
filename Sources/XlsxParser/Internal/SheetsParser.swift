@@ -49,9 +49,9 @@ public struct SheetsParser {
 	}
 
 	public var survey: SurveySheet
-	public var choices: ChoicesSheet
-	public var settings: SettingsSheet
-	public var actualSettings: SettingsSheet.Row
+	public var choices: ChoicesSheet?
+	public var settings: SettingsSheet?
+	public var actualSettings: SettingsSheet.Row?
 	public var languagesAvailable: Survey.LanguagesAvailable
 
 	//
@@ -89,22 +89,39 @@ public struct SheetsParser {
 			}
 		}
 
-		// All must be present or else throw an error.
-		guard let surveySheet = _surveySheet, let choicesSheet = _choicesSheet, let settingsSheet = _settingsSheet else {
-			var notFoundOnes: [ParsingError] = []
+		//
+		if _surveySheet == nil {
+			guard let _ = _surveySheet, let _ = _choicesSheet, let _ = _settingsSheet else {
+				var notFoundOnes: [ParsingError] = []
 
-			if _surveySheet == nil { notFoundOnes.append(.surveyWorksheetNotFound) }
-			if _choicesSheet == nil { notFoundOnes.append(.choicesWorksheetNotFound) }
-			if _settingsSheet == nil { notFoundOnes.append(.settingsWorksheetNotFound) }
+				if _surveySheet == nil { notFoundOnes.append(.surveyWorksheetNotFound) }
+				if _choicesSheet == nil { notFoundOnes.append(.choicesWorksheetNotFound) }
+				if _settingsSheet == nil { notFoundOnes.append(.settingsWorksheetNotFound) }
 
-			// In case only one was not found.
-			if notFoundOnes.count == 1, let theOnlyOne = notFoundOnes.first {
-				throw theOnlyOne
-			}
-			else {
-				throw ParsingError.multipleWorksheetNotFound(notFoundOnes)
+				// In case only one was not found.
+				if notFoundOnes.count == 1, let theOnlyOne = notFoundOnes.first {
+					throw theOnlyOne
+				}
+				// This `else` is the same as `if notFoundOnes.count > 1`
+				// becuase the case of `count == 1` was covered already
+				// and code execution would not have reached this point otherwise.
+				else {
+					throw ParsingError.multipleWorksheetNotFound(notFoundOnes)
+				}
 			}
 		}
+		//
+		if _choicesSheet == nil {
+			print(ParsingError.choicesWorksheetNotFound)
+		}
+		//
+		if _settingsSheet == nil {
+			print(ParsingError.settingsWorksheetNotFound)
+		}
+
+		let surveySheet: CoreXLSX.Worksheet = _surveySheet!
+		let choicesSheet: CoreXLSX.Worksheet? = _choicesSheet
+		let settingsSheet: CoreXLSX.Worksheet? = _settingsSheet
 
 		//--------------------------------------------------
 
@@ -112,13 +129,20 @@ public struct SheetsParser {
 
 		//--------------------------------------------------
 
-		let survey = try SurveySheet(worksheet: surveySheet, sharedStrings: sharedStrings)
+		let survey: SurveySheet = try SurveySheet(worksheet: surveySheet, sharedStrings: sharedStrings)
 
-		let choices = try ChoicesSheet(worksheet: choicesSheet, sharedStrings: sharedStrings)
+		let choices: ChoicesSheet? = try choicesSheet.flatMap { choicesSheet in
+			try ChoicesSheet(worksheet: choicesSheet, sharedStrings: sharedStrings)
+		}
 
-		let settings = try SettingsSheet(worksheet: settingsSheet, sharedStrings: sharedStrings)
-		guard let actualSettings = settings.processedContentRows.first else {
-			throw ParsingError.actualSettingsNotFound
+		let settings: SettingsSheet? = try settingsSheet.flatMap { settingsSheet in
+			try SettingsSheet(worksheet: settingsSheet, sharedStrings: sharedStrings)
+		}
+		let actualSettings: SettingsSheet.Row? = try settings.flatMap { settings in
+			guard let actualSettings = settings.processedContentRows.first else {
+				throw ParsingError.actualSettingsNotFound
+			}
+			return actualSettings
 		}
 
 		//--------------------------------------------------
@@ -132,7 +156,7 @@ public struct SheetsParser {
 			[
 				survey.columnReferences.labelCluster,
 				survey.columnReferences.hintCluster,
-				choices.columnReferences.labelCluster,
+				choices?.columnReferences.labelCluster,
 			]
 			.toUniquelyMergedClusterColumnMetadatas()
 			.toSurveyDatumLanguageArray()
@@ -145,7 +169,7 @@ public struct SheetsParser {
 		let onlyLanguagesInCommonForLabelCluster: [Survey.DatumLanguage] =
 			allLanguages.filterUniquelyCommon(with: [
 				survey.columnReferences.labelCluster,
-				choices.columnReferences.labelCluster,
+				choices?.columnReferences.labelCluster,
 			])
 
 		/// An array of languages available in only the `labelCluster` of the survey's groups and questions.
@@ -161,7 +185,7 @@ public struct SheetsParser {
 		/// Find out which languages are available for `label` in the survey selection answers.
 		let onlyLanguagesInSelectionAnswersForLabelCluster: [Survey.DatumLanguage] =
 			allLanguages.filterUniquelyCommon(with: [
-				choices.columnReferences.labelCluster,
+				choices?.columnReferences.labelCluster,
 			])
 
 		//

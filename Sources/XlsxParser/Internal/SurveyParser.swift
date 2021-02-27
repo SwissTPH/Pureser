@@ -20,6 +20,8 @@ public struct SurveyParser {
 
 		case aGroupEndedWithoutStarting
 
+		case referenceToChoicesSheetButChoicesWorksheetNotFound(inQuestion: String, questionType: String)
+
 	}
 
 	//
@@ -179,8 +181,15 @@ public struct SurveyParser {
 						|| surveyQuestionType == SurveyQuestionType.rank.rawValue
 					{
 
+						//
+						guard let choicesSheet = sheets.choices else {
+							throw ParsingError.referenceToChoicesSheetButChoicesWorksheetNotFound(
+								inQuestion: survaySheetRow.name ?? "",
+								questionType: survaySheetRow.type ?? "")
+						}
+
 						// Find out the selection question's answers.
-						answers = sheets.choices.processedContentRows.filter { (choicesSheetRow: ChoicesSheet.Row) in
+						answers = choicesSheet.processedContentRows.filter { (choicesSheetRow: ChoicesSheet.Row) in
 							//
 							let cellStringValue = choicesSheetRow.listName
 
@@ -327,24 +336,24 @@ public struct SurveyParser {
 		// It is `nil` if not present a default language in the settings sheet.
 		// If present, find it in the languages array.
 		let defaultLanguage: Survey.DatumLanguage? =
-			sheets.actualSettings.defaultLanguage.flatMap { defaultLanguage in
+			sheets.actualSettings?.defaultLanguage.flatMap { defaultLanguage in
 				sheets.languagesAvailable.all.first { language in
 					language.languageLabel == defaultLanguage
 				}
 			}
 
 		let style: Survey.Style? =
-			sheets.actualSettings.style.flatMap { Survey.Style(rawValue: $0) }
+			sheets.actualSettings?.style.flatMap { Survey.Style(rawValue: $0) }
 
 		survey = Survey(
-			formTitle: sheets.actualSettings.formTitle,
-			formID: sheets.actualSettings.formID,
-			version: sheets.actualSettings.version,
+			formTitle: sheets.actualSettings?.formTitle,
+			formID: sheets.actualSettings?.formID,
+			version: sheets.actualSettings?.version,
 			defaultLanguage: defaultLanguage,
 			style: style,
-			instanceName: sheets.actualSettings.instanceName,
-			publicKey: sheets.actualSettings.publicKey,
-			submissionURL: sheets.actualSettings.submissionURL,
+			instanceName: sheets.actualSettings?.instanceName,
+			publicKey: sheets.actualSettings?.publicKey,
+			submissionURL: sheets.actualSettings?.submissionURL,
 
 			languagesAvailable: sheets.languagesAvailable,
 
