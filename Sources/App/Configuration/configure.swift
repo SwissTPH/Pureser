@@ -55,15 +55,35 @@ public func configure(_ app: Application) throws {
 	}
 	// In case db config vars are provided apart (not as URL) by env.
 	else if
+		let hostname = Environment.get("DATABASE_HOST"),
+		let username = Environment.get("DATABASE_USERNAME"),
+		let password = Environment.get("DATABASE_PASSWORD"),
+		let database = Environment.get("DATABASE_NAME")
+	{
+		let port = Environment.get("DATABASE_PORT")
+			.flatMap(Int.init(_:)) ?? PostgresConfiguration.ianaPortNumber
+
+		psqlConfigFactory = .postgres(
+			hostname: hostname,
+			port: port,
+			username: username,
+			password: password,
+			database: database
+		)
+	}
+	// In case db config vars are provided apart (not as URL) by env.
+	else if
 		let psqlHostname = Environment.get("POSTGRESQL_HOST"),
-		let psqlPortString = Environment.get("POSTGRESQL_PORT"),
 		let psqlUsername = Environment.get("POSTGRESQL_USERNAME"),
 		let psqlPassword = Environment.get("POSTGRESQL_PASSWORD"),
 		let psqlSchema = Environment.get("POSTGRESQL_DATABASE")
 	{
+		let psqlPort = Environment.get("POSTGRESQL_PORT")
+			.flatMap(Int.init(_:)) ?? PostgresConfiguration.ianaPortNumber
+
 		psqlConfigFactory = .postgres(
 			hostname: psqlHostname,
-			port: Int(psqlPortString)!,
+			port: psqlPort,
 			username: psqlUsername,
 			password: psqlPassword,
 			database: psqlSchema
