@@ -71,10 +71,11 @@ public struct SurveyParser {
 			}
 
 			// Merge different writing styles.
-			typeFull = typeFull.replacingOccurrences(of: "select one", with: "select_one")
-			typeFull = typeFull.replacingOccurrences(of: "select multiple", with: "select_multiple")
-			typeFull = typeFull.replacingOccurrences(of: "begin_group", with: "begin group")
-			typeFull = typeFull.replacingOccurrences(of: "end_group", with: "end group")
+			for typeCase in SurveyQuestionType.onlyCasesWithKeySynonyms {
+				for synonym in typeCase.keySynonyms {
+					typeFull = typeFull.replacingOccurrences(of: synonym, with: typeCase.key)
+				}
+			}
 
 			// Find out the current survey item's orginal label.
 			/// The current survey item's original label, which consists of an array of translations.
@@ -97,10 +98,10 @@ public struct SurveyParser {
 
 			// MARK: - if begin group
 			//
-			if typeFull == "begin group" || typeFull == "begin repeat" {
+			if typeFull == SurveyQuestionType.begin_group.rawValue || typeFull == SurveyQuestionType.begin_repeat.rawValue {
 
 				//
-				let groupType: SurveyGroupType = typeFull == "begin repeat" ? .repeatTable : .basic
+				let groupType: SurveyGroupType = typeFull == SurveyQuestionType.begin_repeat.rawValue ? .repeatTable : .basic
 
 				//
 				var surveyGroupName = survaySheetRow.name
@@ -132,7 +133,7 @@ public struct SurveyParser {
 			}
 			// MARK: - if end group
 			//
-			else if typeFull == "end group" || typeFull == "end repeat" {
+			else if typeFull == SurveyQuestionType.end_group.rawValue || typeFull == SurveyQuestionType.end_repeat.rawValue {
 
 				// If there is an "end group" without begin a "start group".
 				if surveyGroups.isEmpty {
@@ -165,7 +166,7 @@ public struct SurveyParser {
 
 				// If there is a space
 				if typeFull.contains(" ") && (
-					typeFull.contains(SurveyQuestionType.selectOne.rawValue) || typeFull.contains(SurveyQuestionType.selectMultiple.rawValue)
+					typeFull.hasPrefix(SurveyQuestionType.selectOne.rawValue) || typeFull.hasPrefix(SurveyQuestionType.selectMultiple.rawValue) || typeFull.hasPrefix(SurveyQuestionType.rank.rawValue)
 				) {
 
 					//

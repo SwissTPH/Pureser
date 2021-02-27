@@ -264,232 +264,370 @@ final class ConvertedDocumentPage {
 					}
 				}
 
-				if surveyQuestion.type == .start {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.start) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div { "Start time:" + (false ? " __ : __ : __ (HH:MM:SS)" : "") }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .end {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.end) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div { "End time:" + (false ? " __ : __ : __ (HH:MM:SS)" : "") }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .today {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div { "Today: __ / __ / ____ (DD/MM/YYYY)" }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .date {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div { "Date: __ / __ / ____ (DD/MM/YYYY)" }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .deviceID {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.deviceID) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Device ID:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .simSerial {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.simSerial) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "SIM serial:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .phoneNumber {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.phoneNumber) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Phone number:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .startGeopoint {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.startGeopoint) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Start geopoint:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .geopoint {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.geopoint) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Geopoint:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .barcode {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.barcode) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Barcode:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .range {
-					if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.range) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Range:" }
-						(1...2).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-
-				else if surveyQuestion.type == .integer {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.integer) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Integer:" }
-						(1...1).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .decimal {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.decimal) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Decimal:" }
-						(1...1).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .calc {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.calc) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Calculate:" }
-						(1...3).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-
-				else if surveyQuestion.type == .note {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.note) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Note:" }
-						(1...3).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .text {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.text) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Text:" }
-						(1...3).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-
-				else if surveyQuestion.type == .audit {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.audit) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Audit:" }
-						(1...3).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .rank {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.rank) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Rank:" }
-						(1...3).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-				else if surveyQuestion.type == .trigger {
-					if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.trigger) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-						div(class: "faded-dd") { "Trigger:" }
-						(1...3).map { _ in br() }
-					} else {
-						(1...1).map { _ in br() }
-					}
-				}
-
-				else if surveyQuestion.type == .selectOne || surveyQuestion.type == .selectMultiple {
-					if !surveyQuestion.answers.isEmpty {
-						if true {
+				nodeContainer {
+					switch surveyQuestion.type {
+					case .unknown:
+						return nodeContainer {
+							span(class: "faded-l") { "Question type is unknown (" + surveyQuestion.typeFull + ")." }
+						}
+					case .start:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.start) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div { "Start time:" + (false ? " __ : __ : __ (HH:MM:SS)" : "") }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .end:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.end) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div { "End time:" + (false ? " __ : __ : __ (HH:MM:SS)" : "") }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .today:
+						return nodeContainer {
 							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-								if surveyQuestion.type == .selectOne && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectOne) {
-									div(class: "faded-dd") {
-										if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
-											"Choose only one option:"
-										} else {
-											"Select one:"
+								div { "Today: __ / __ / ____ (DD/MM/YYYY)" }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .deviceid:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.deviceID) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Device ID:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .phonenumber:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.phoneNumber) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Phone number:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .username:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.username) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Username:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .email:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.email) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Email:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .audit:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.audit) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Audit:" }
+								(1...3).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .startGeopoint:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.startGeopoint) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Start geopoint:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .simSerial:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.simSerial) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "SIM serial:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .integer:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.integer) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Integer:" }
+								(1...1).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .decimal:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.decimal) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Decimal:" }
+								(1...1).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .range:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.range) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Range:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .text:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.text) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Text:" }
+								(1...3).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					// MARK: - START: select.../rank
+					case .select_one, .select_multiple, .rank:
+						return nodeContainer {
+							if !surveyQuestion.answers.isEmpty {
+								if true {
+									if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+										if surveyQuestion.type == .selectOne && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectOne) {
+											div(class: "faded-dd") {
+												if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
+													"Choose only one option:"
+												} else {
+													"Select one:"
+												}
+											}
+										} else if surveyQuestion.type == .selectMultiple && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectMultiple) {
+											div(class: "faded-dd") {
+												if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
+													"Choose one or more options:"
+												} else {
+													"Select multiple:"
+												}
+											}
+										} else if surveyQuestion.type == .rank && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.rank) {
+											div(class: "faded-dd") {
+												"Rank the following options:"
+											}
 										}
 									}
-								} else if surveyQuestion.type == .selectMultiple && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectMultiple) {
-									div(class: "faded-dd") {
-										if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
-											"Choose one or more options:"
-										} else {
-											"Select multiple:"
+
+									table(class: "answers") {
+										tbody {
+											surveyQuestion.answers.map { (surveySelectionQuestionAnswer: SurveySelectionQuestionAnswer) -> Node in nodeContainer {
+												tr {
+													if surveyQuestion.type == .selectOne && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
+														td(class: "answer-input-td") {
+															input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "radio", value: surveySelectionQuestionAnswer.answerID)
+														}
+													}
+													else if surveyQuestion.type == .selectMultiple && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
+														td(class: "answer-input-td") {
+															input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "checkbox", value: surveySelectionQuestionAnswer.answerID)
+														}
+													}
+													else if surveyQuestion.type == .rank && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable/* || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable*/) {
+														td(class: "answer-input-td") {
+															input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, style: "width: 90%;", type: "text", value: "")
+														}
+													}
+
+													if resultsLayoutDisplayOptions.displaySelectAnswersID {
+														td(class: "answer-string-id-td") {
+															span(class: "faded-l") { "[" }
+															span(class: "faded-d") { surveySelectionQuestionAnswer.answerID }
+															span(class: "faded-l") { "]" }
+														}
+													}
+
+													td(class: "answer-text-td") {
+														if Settings.Debug.SurveyLocalizedData.surveyQuestionSelectionAnswerLabel {
+															Self.debugHelper(localizedData: surveySelectionQuestionAnswer.answerLabel, debugTitle: "Answer's original label: ")
+														}
+
+														helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
+													}
+												}
+											}} // end .map & nodeContainer
 										}
 									}
 								} else {
-									//
-								}
-							}
-
-							table(class: "answers") {
-								tbody {
 									surveyQuestion.answers.map { (surveySelectionQuestionAnswer: SurveySelectionQuestionAnswer) -> Node in nodeContainer {
-										tr {
-											if surveyQuestion.type == .selectOne && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
-												td(class: "answer-input-td") {
-													input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "radio", value: surveySelectionQuestionAnswer.answerID)
-												}
-											}
-											else if surveyQuestion.type == .selectMultiple && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
-												td(class: "answer-input-td") {
-													input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "checkbox", value: surveySelectionQuestionAnswer.answerID)
-												}
-											}
-
-											if resultsLayoutDisplayOptions.displaySelectAnswersID {
-												td(class: "answer-string-id-td") {
-													span(class: "faded-l") { "[" }
-													span(class: "faded-d") { surveySelectionQuestionAnswer.answerID }
-													span(class: "faded-l") { "]" }
-												}
-											}
-
-											td(class: "answer-text-td") {
-												if Settings.Debug.SurveyLocalizedData.surveyQuestionSelectionAnswerLabel {
-													Self.debugHelper(localizedData: surveySelectionQuestionAnswer.answerLabel, debugTitle: "Answer's original label: ")
-												}
-
-												helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
-											}
+										div {
+											"[" + surveySelectionQuestionAnswer.answerID + "]"
+											helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
 										}
 									}} // end .map & nodeContainer
 								}
+							} else {
+								span(class: "faded-l") { "No answers were provided." }
 							}
-						} else {
-							surveyQuestion.answers.map { (surveySelectionQuestionAnswer: SurveySelectionQuestionAnswer) -> Node in nodeContainer {
-								div {
-									"[" + surveySelectionQuestionAnswer.answerID + "]"
-									helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
-								}
-							}} // end .map & nodeContainer
 						}
-					} else {
-						span(class: "faded-l") { "No answers were provided." }
+					case .select_one_from_file:
+						return nodeContainer {
+							span(class: "faded-l") { #"Question type "select_one_from_file" is not supported."# }
+						}
+					case .select_multiple_from_file:
+						return nodeContainer {
+							span(class: "faded-l") { #"Question type "select_multiple_from_file" is not supported."# }
+						}
+					// MARK: END: select.../rank -
+					case .note:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.note) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Note:" }
+								(1...3).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .geopoint:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.geopoint) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Geopoint:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .geotrace:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.geotrace) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Geotrace:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .geoshape:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.geopoint) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Geoshape:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .date:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div { "Date: __ / __ / ____ (DD/MM/YYYY)" }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .time:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.time) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div { "Time:" + (true ? " __ : __ : __ (HH:MM:SS)" : "") }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .dateTime:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.dateTime) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div {
+									"Date: __ / __ / ____ (DD/MM/YYYY)"
+									br()
+									"Time:" + (true ? " __ : __ : __ (HH:MM:SS)" : "")
+								}
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .image:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.image) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Image:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .audio:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.audio) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Audio:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .video:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.video) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Video:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .file:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.file) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "File:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .barcode:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.barcode) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Barcode:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .calculate:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.calc) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Calculate:" }
+								(1...3).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .acknowledge:
+						return nodeContainer {
+							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.acknowledge) && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.trigger) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Acknowledge:" }
+								//div(class: "faded-dd") { "Trigger:" }
+								(1...3).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
+						}
+					case .hidden:
+						return nodeContainer {
+							// Print nothing.
+						}
+					case .xmlExternal:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.xmlExternal) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "External XML:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .begin_group, .end_group, .begin_repeat, .end_repeat:
+						return nodeContainer {
+							// Print nothing.
+						}
 					}
-				}
-
-				else {
-					span(class: "faded-l") { "Question type is unknown (" + surveyQuestion.typeFull + ")." }
 				}
 
 			}
