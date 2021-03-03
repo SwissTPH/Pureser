@@ -237,9 +237,11 @@ struct FileConversionLogPage {
 							tbody {
 								if !self.fileConversionLog.isEmpty {
 									self.fileConversionLog.map { (entry: FileConversionLog) -> Node in
-										printedEntriesCount += 1
+										defer {
+											printedEntriesCount += 1
+										}
 										return nodeContainer {
-											if printedEntriesCount % repeatTableHeaderRowEvery == 0 {
+											if printedEntriesCount > 0 && printedEntriesCount % repeatTableHeaderRowEvery == 0 {
 												tableHeaderRow
 											}
 
