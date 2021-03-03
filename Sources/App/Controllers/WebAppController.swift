@@ -183,7 +183,7 @@ struct WebAppController: RouteCollection {
 
 	func fileConversionLogPageHandler(_ req: Request) throws -> EventLoopFuture<Response> {
 
-		let queryRequestLimit: Int = 100
+		let queryRequestLimit: Int = Settings.debug ? 100 : 20
 
 		let dbr = FileConversionLog.DatabaseRepository(database: req.db)
 		let fileConversionLogCount = dbr.count()
