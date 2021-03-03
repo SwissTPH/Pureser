@@ -146,7 +146,7 @@ struct WebAppController: RouteCollection {
 				fileConversionLogEntry.conversionFailureErrors.append(errorDescription)
 
 				throw Abort(.badRequest, reason: errorDescription)
-			} catch let error where error is SheetsParser.ParsingError {
+			} catch let error where error is SheetsParsingError {
 				//
 				fileConversionLogEntry.conversionStatus = .failure
 				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
