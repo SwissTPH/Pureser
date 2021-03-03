@@ -52,7 +52,7 @@ internal struct Getter {
 			return columnReference
 		} else {
 			print("Error: 43/28-01.")
-			throw SheetsParser.ParsingError.columnNotFound(titleAnyOf: columnTitles, inWorksheet: inWorksheet)
+			throw SheetsParser.ParsingError.columnByTitleOrSynonymsNotFound(titleAnyOf: columnTitles, inWorksheet: inWorksheet)
 		}
 	}
 
