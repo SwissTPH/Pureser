@@ -54,15 +54,15 @@ public struct SurveyParser {
 
 		// For every row (except first which should be already dropped) in the sheet's rows, do:
 		// Also, all string values have already been `whitespacesAndNewlines`-trimmed.
-		for survaySheetRow: SurveySheet.Row in sheets.survey.processedContentRows {
+		for surveySheetRow: SurveySheet.Row in sheets.survey.processedContentRows {
 
 			// Skip completely empty rows. Although there should not be any.
-			if survaySheetRow.isVacant {
+			if surveySheetRow.isVacant {
 				continue
 			}
 
 			// Skip rows where the `type`-titled cell is nil or empty.
-			guard var typeFull = survaySheetRow.type, !typeFull.isEmpty else {
+			guard var typeFull = surveySheetRow.type, !typeFull.isEmpty else {
 				continue
 			}
 
@@ -91,18 +91,18 @@ public struct SurveyParser {
 			/// The current survey item's original label, which consists of an array of translations.
 			///
 			/// Note: a survey item can be either a group or a question.
-			let surveyItemLabelFull: Survey.LocalizedData = survaySheetRow.labelCluster ?? []
+			let surveyItemLabelFull: Survey.LocalizedData = surveySheetRow.labelCluster ?? []
 
 			// Find out the current survey item's label.
 			/// The current survey item's label, which consists of an array of translations.
 			///
 			/// Note: a survey item can be either a group or a question.
-			let surveyItemLabel: Survey.LocalizedData = survaySheetRow.labelCluster ?? []
+			let surveyItemLabel: Survey.LocalizedData = surveySheetRow.labelCluster ?? []
 
 			//--------------------------------------------------
 
 			//
-			let surveyItemRelevanceUnprocessed: String? = survaySheetRow.relevant
+			let surveyItemRelevanceUnprocessed: String? = surveySheetRow.relevant
 
 			//--------------------------------------------------
 
@@ -114,7 +114,7 @@ public struct SurveyParser {
 				let groupType: SurveyGroupType = typeFull == SurveyQuestionType.begin_repeat.rawValue ? .repeatTable : .basic
 
 				//
-				var surveyGroupName = survaySheetRow.name
+				var surveyGroupName = surveySheetRow.name
 
 				//
 				var surveyGroupLabel = surveyItemLabel
@@ -197,8 +197,8 @@ public struct SurveyParser {
 						//
 						guard let choicesSheet = sheets.choices else {
 							throw ParsingError.referenceToChoicesSheetButChoicesWorksheetNotFound(
-								inQuestion: survaySheetRow.name ?? "",
-								questionType: survaySheetRow.type ?? "")
+								inQuestion: surveySheetRow.name ?? "",
+								questionType: surveySheetRow.type ?? "")
 						}
 
 						// Find out the selection question's answers.
@@ -227,7 +227,7 @@ public struct SurveyParser {
 				//--------------------------------------------------
 
 				//
-				let surveyQuestionName = survaySheetRow.name ?? ""
+				let surveyQuestionName = surveySheetRow.name ?? ""
 
 				//
 				let surveyQuestionLabelFull = surveyItemLabelFull
@@ -253,7 +253,7 @@ public struct SurveyParser {
 				}
 
 				//
-				let surveyQuestionHint: Survey.LocalizedData = survaySheetRow.hintCluster ?? []
+				let surveyQuestionHint: Survey.LocalizedData = surveySheetRow.hintCluster ?? []
 
 				//--------------------------------------------------
 
