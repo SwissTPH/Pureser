@@ -7,7 +7,6 @@
 
 import Foundation
 import Vapor
-import enum CoreXLSX.CoreXLSXError
 import struct SurveyTypes.Survey
 import XlsxParser
 
@@ -118,10 +117,14 @@ struct WebAppController: RouteCollection {
 		let filename = file.filename
 		print(#"File attached filename: "\#(filename)"."#)
 
-		//
-		let survey: Survey = try {
+		//--------------------------------------------------
 
-			//
+		let survey: Survey
+		let _survey: () throws -> Survey = {
+			try FormFile(fileData: fileData, filename: filename).parseSurvey()
+		}
+
+		if Settings.Feature.fileConversionLog {
 			let fileConversionLogEntry: FileConversionLog = FileConversionLog(
 				filename: filename,
 				fileChecksum: .init(fileData: fileData),
@@ -129,43 +132,21 @@ struct WebAppController: RouteCollection {
 			)
 			defer {
 				fileConversionLogEntry.conversionEndDatetime = Date()
+
+				// This is in case the code execution stops unexpectedly.
+				if fileConversionLogEntry.conversionStatus == .ongoing
+					&& fileConversionLogEntry.conversionStatus != .success {
+					fileConversionLogEntry.conversionStatus = .failure
+				}
+
 				if Settings.Feature.fileConversionLog {
 					_ = fileConversionLogEntry.save(on: req.db)
 				}
 			}
 
-			//
-			let sheets: SheetsParser
 			do {
-				sheets = try SheetsParser(fileData: fileData, filename: filename)
-			} catch CoreXLSXError.dataIsNotAnArchive {
-				let errorDescription = "No valid XLSX file attached."
-
-				//
-				fileConversionLogEntry.conversionStatus = .failure
-				fileConversionLogEntry.conversionFailureErrors.append(errorDescription)
-
-				throw Abort(.badRequest, reason: errorDescription)
-			} catch let error where error is SheetsParsingError {
-				//
-				fileConversionLogEntry.conversionStatus = .failure
-				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
-
-				throw error
-			} catch let error {
-				//
-				fileConversionLogEntry.conversionStatus = .failure
-				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
-
-				print(error)
-				throw Abort(.badRequest, reason: "Error: 120/21-12. XLSX file cannot be parsed.")
-			}
-
-			//
-			let survey: Survey
-			do {
-				survey = try SurveyParser.parseIntoSurvey(using: sheets)
-			} catch let error {
+				survey = try _survey()
+			} catch {
 				//
 				fileConversionLogEntry.conversionStatus = .failure
 				fileConversionLogEntry.conversionFailureErrors.append(String(describing: error))
@@ -176,10 +157,15 @@ struct WebAppController: RouteCollection {
 			//
 			fileConversionLogEntry.conversionStatus = .success
 			fileConversionLogEntry.conversionSuccessNotices.append(contentsOf: [])
+		} else {
+			do {
+				survey = try _survey()
+			} catch {
+				throw error
+			}
+		}
 
-			//
-			return survey
-		}()
+		//--------------------------------------------------
 
 		//
 		return ConvertedDocumentPage(survey: survey, uploadPageFormData: uploadPageFormData).htmlResponse()
