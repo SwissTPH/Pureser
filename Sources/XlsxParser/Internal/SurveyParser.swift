@@ -22,6 +22,8 @@ public struct SurveyParser {
 
 		case referenceToChoicesSheetButChoicesWorksheetNotFound(inQuestion: String, questionType: String)
 
+		case invalidQuestionTypeOptions(in: String)
+
 	}
 
 	//
@@ -72,10 +74,24 @@ public struct SurveyParser {
 				continue
 			}
 
+			//
+			typeFull = try typeFull.replacingMatches(regexPattern: #"\s+"#, withTemplate: " ")
+
 			// Merge different writing styles.
 			for typeCase in SurveyQuestionType.onlyCasesWithKeySynonyms {
 				for synonym in typeCase.keySynonyms {
-					typeFull = typeFull.replacingOccurrences(of: synonym, with: typeCase.key)
+					if typeFull == synonym {
+						typeFull = typeFull.replacingOccurrences(of: synonym, with: typeCase.key)
+					} else if typeFull.contains(" ") {
+						var split = typeFull.split(separator: " ")
+						let last = split.removeLast()
+						let rest = split.joined(separator: " ")
+						if rest == synonym {
+							typeFull =
+								rest.replacingOccurrences(of: synonym, with: typeCase.key)
+								+ " " + last
+						}
+					}
 				}
 			}
 
@@ -172,7 +188,12 @@ public struct SurveyParser {
 				) {
 
 					//
-					let typeFullSplit = typeFull.split(separator: " ")
+					let typeFullSplit = try typeFull
+						.replacingMatches(regexPattern: #"\s+"#, withTemplate: " ")
+						.split(separator: " ")
+					guard typeFullSplit.count == 2 else {
+						throw ParsingError.invalidQuestionTypeOptions(in: typeFull)
+					}
 					surveyQuestionType = typeFullSplit[0].trimmingCharacters(in: .whitespacesAndNewlines)
 					let surveyQuestionTypeID = typeFullSplit[1].trimmingCharacters(in: .whitespacesAndNewlines)
 
