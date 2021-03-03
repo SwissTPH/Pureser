@@ -288,31 +288,62 @@ struct RelevanceParser {
 			}
 
 			//
-			let _answer: SurveySelectionQuestionAnswer? = question.answers.lazy.first {
-				(selectionAnswer: SurveySelectionQuestionAnswer) in
+			if [SurveyQuestionType.select_one, .select_multiple, .rank].contains(question.type) {
 
-				selectionAnswer.answerID == capturedQuestionAnswerNameID
-			}
-			//
-			guard let answer = _answer else {
+				//
+				let _answer: SurveySelectionQuestionAnswer? = question.answers.lazy.first {
+					(selectionAnswer: SurveySelectionQuestionAnswer) in
 
-				if questionOfTypeCalcWithPatternIsAsTypeBoolean && question.type == .calc && question.name.lowercased().hasPrefix("is") && ["0", "1"].contains(capturedQuestionAnswerNameID) {
-
-					return nodeContainer {
-						%span(class: "relevance-precondition") {
-							%span(class: "relevance-segment rsg-qs") {
-								(question.label.first?.translation ?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
-							}%
-							%span(class: "relevance-segment rsg-co") {
-								"is".spacesToNBSP
-							}%
-							%span(class: "relevance-segment rsg-as") {
-								(capturedQuestionAnswerNameID == "1" ? "True" : "False").spacesToNBSP
-							}%
-						}%
-					}.renderAsString()
+					selectionAnswer.answerID == capturedQuestionAnswerNameID
 				}
 
+				//
+				return nodeContainer {
+					%span(class: "relevance-precondition") {
+						%span(class: "relevance-segment rsg-qs") {
+							(question.label.first?.translation
+								?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
+						}%
+						%span(class: "relevance-segment rsg-co") {
+							capturedOperator.spacesToNBSP
+						}%
+						if let answer = _answer {
+							%span(class: "relevance-segment rsg-as") {
+								(answer.answerLabel.first?.translation
+									?? #"Answer "\#(capturedQuestionAnswerNameID)" translation not found;"#).spacesToNBSP
+							}%
+						} else {
+							%span(class: "relevance-segment rsg-nf") {
+								#"Answer "\#(capturedQuestionAnswerNameID)" not found;"#.spacesToNBSP
+							}%
+						}
+					}%
+				}.renderAsString()
+
+			}
+			//
+			else if questionOfTypeCalcWithPatternIsAsTypeBoolean && question.type == .calc && question.name.lowercased().hasPrefix("is") && ["0", "1"].contains(capturedQuestionAnswerNameID) {
+
+				//
+				return nodeContainer {
+					%span(class: "relevance-precondition") {
+						%span(class: "relevance-segment rsg-qs") {
+							(question.label.first?.translation ?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
+						}%
+						%span(class: "relevance-segment rsg-co") {
+							"is".spacesToNBSP
+						}%
+						%span(class: "relevance-segment rsg-as") {
+							(capturedQuestionAnswerNameID == "1" ? "True" : "False").spacesToNBSP
+						}%
+					}%
+				}.renderAsString()
+
+			}
+			//
+			else {
+
+				//
 				return nodeContainer {
 					%span(class: "relevance-precondition") {
 						%span(class: "relevance-segment rsg-qs") {
@@ -321,31 +352,13 @@ struct RelevanceParser {
 						%span(class: "relevance-segment rsg-co") {
 							capturedOperator.spacesToNBSP
 						}%
-						%span(class: "relevance-segment rsg-nf") {
-							#"Answer "\#(capturedQuestionAnswerNameID)" not found;"#.spacesToNBSP
+						%span(class: "relevance-segment rsg-as") {
+							#"\#(capturedQuestionAnswerNameID)"#.spacesToNBSP
 						}%
 					}%
 				}.renderAsString()
+
 			}
-
-			//--------------------------------------------------
-
-			//
-			return nodeContainer {
-				%span(class: "relevance-precondition") {
-					%span(class: "relevance-segment rsg-qs") {
-						(question.label.first?.translation
-							?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
-					}%
-					%span(class: "relevance-segment rsg-co") {
-						capturedOperator.spacesToNBSP
-					}%
-					%span(class: "relevance-segment rsg-as") {
-						(answer.answerLabel.first?.translation
-							?? #"Answer "\#(capturedQuestionAnswerNameID)" translation not found;"#).spacesToNBSP
-					}%
-				}%
-			}.renderAsString()
 		})
 		stepByStep.append(_r)
 
