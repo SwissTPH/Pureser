@@ -68,7 +68,7 @@ public enum SheetsParsingError: Error, CustomStringConvertible {
 				}
 				.joined(separator: ", ")
 			return "Multiple worksheets are missing: " + x + "."
-				+ #"The "survey" sheet is requird, the "choices" and "settings" sheets are optional."#
+				+ #" The "survey" sheet is requird, the "choices" and "settings" sheets are optional."#
 
 		case .surveyWorksheetIsEmpty:
 			return #"The "survey" worksheet is blank."#
