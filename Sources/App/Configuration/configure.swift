@@ -39,6 +39,7 @@ public func configure(_ app: Application) throws {
 	}
 	// In case `DATABASE_URL` var is provided by env (e.g. in case of Heroku for the attached db).
 	else if
+		false, // for heroku, unverified TLS is required if you are using Heroku Postgres's standard plan.
 		let psqlURL = Environment.get("DATABASE_URL").flatMap(URL.init),
 		let _psqlConfigFactory: DatabaseConfigurationFactory = try? .postgres(url: psqlURL)
 	{
