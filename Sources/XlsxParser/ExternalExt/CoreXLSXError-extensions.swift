@@ -25,7 +25,7 @@ extension CoreXLSXError {
 				return "Unsupported worksheet path."
 			}
 		}
-		return "Not a valid XLSX file. (\(x))"
+		return "Invalid or unsupported XLSX file. (\(x))"
 	}
 
 	private var _localizedDescription: String {
