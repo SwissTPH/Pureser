@@ -12,8 +12,8 @@ import Foundation
 // MARK: - SurveyItemProtocol
 
 public protocol SurveyItemProtocol: Codable {
-	var relevance: String? { get }
-	var relevanceStepByStep: [String] { get } // for debugging
+	var relevance: Survey.LocalizedData? { get }
+	var relevanceStepByStep: [Survey.LocalizedData] { get } // for debugging
 	var relevanceUnprocessed: String? { get }
 }
 

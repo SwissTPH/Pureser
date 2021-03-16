@@ -15,10 +15,49 @@ import SurveyTypes
 
 struct RelevanceParser {
 
-	/// A helper handler for processing relevance.
+	/// A helper handler for processing relevance for multiple languages.
 	///
 	///
-	static func relevanceHelper(unprocessedRelevance: String, referenceSurveyItems: [SurveyItem])
+	static func relevanceHelper(
+		unprocessedRelevance: String,
+		referenceSurveyItems: [SurveyItem],
+		datumLanguages: [Survey.DatumLanguage]
+	)
+	throws -> (final: Survey.LocalizedData, stepByStep: [Survey.LocalizedData]) {
+
+		var stepByStep: [Survey.LocalizedData] = []
+		var final: Survey.LocalizedData = []
+
+		for datumLanguage: Survey.DatumLanguage in datumLanguages {
+
+			let t = try RelevanceParser.relevanceHelper(
+				unprocessedRelevance: unprocessedRelevance,
+				referenceSurveyItems: referenceSurveyItems,
+				datumLanguage: datumLanguage
+			)
+
+			stepByStep.append(
+				t.stepByStep.map { step in
+					Survey.LocalizedDatum(datumLanguage: datumLanguage, translation: step)
+				}
+			)
+
+			final.append(
+				Survey.LocalizedDatum(datumLanguage: datumLanguage, translation: t.final)
+			)
+		}
+
+		return (final: final, stepByStep: stepByStep)
+	}
+
+	/// A helper handler for processing relevance for one language.
+	///
+	///
+	private static func relevanceHelper(
+		unprocessedRelevance: String,
+		referenceSurveyItems: [SurveyItem],
+		datumLanguage: Survey.DatumLanguage
+	)
 	throws -> (final: String, stepByStep: [String]) {
 
 		var _r = unprocessedRelevance
@@ -43,6 +82,12 @@ struct RelevanceParser {
 		/// Question of type `.calc` and with `id` (a.k.a `name` in the xlsx files) starting with `"is"`
 		/// to be treated as boolean questions in the relevance of other questions.
 		let questionOfTypeCalcWithPatternIsAsTypeBoolean: Bool = true
+
+
+		/// Whether the language is English or not.
+		let isEnglish: Bool = ["english", "(en)"].contains { datumLanguage.languageLabel.lowercased().contains($0) }
+		/// Use symbols (where possible) instead of linguistic representation.
+		let useSymbols: Bool = false || !isEnglish
 
 		//--------------------------------------------------
 
@@ -104,11 +149,11 @@ struct RelevanceParser {
 		let logicalOperatorsPairsBatch: [_TRP] = [
 			_TRP(
 				target: "and",
-				replacement: "AND"
+				replacement: (useSymbols) ? "&&".htmlEscape() : "AND"
 			),
 			_TRP(
 				target: "or",
-				replacement: "OR"
+				replacement: (useSymbols) ? "||".htmlEscape() : "OR"
 			),
 		]
 		for pair in logicalOperatorsPairsBatch {
@@ -196,27 +241,27 @@ struct RelevanceParser {
 		let basicComparisonOperatorsPairsBatch: [_TRP] = [
 			_TRP(
 				target: ">=",
-				replacement: "is greater than or equal with"
+				replacement: (useSymbols) ? "≥".htmlEscape() : "is greater than or equal with"
 			),
 			_TRP(
 				target: ">",
-				replacement: "is greater than"
+				replacement: (useSymbols) ? ">".htmlEscape() : "is greater than"
 			),
 			_TRP(
 				target: "<=",
-				replacement: "is less than or equal with"
+				replacement: (useSymbols) ? "≤".htmlEscape() : "is less than or equal with"
 			),
 			_TRP(
 				target: "<",
-				replacement: "is less than"
+				replacement: (useSymbols) ? "<".htmlEscape() : "is less than"
 			),
 			_TRP(
 				target: "!=",
-				replacement: "was NOT answered with"
+				replacement: (useSymbols) ? "≠".htmlEscape() : "was NOT answered with"
 			),
 			_TRP(
 				target: "=",
-				replacement: "was answered with"
+				replacement: (useSymbols) ? "=".htmlEscape() : "was answered with"
 			),
 		]
 		for pair in basicComparisonOperatorsPairsBatch {
@@ -301,7 +346,7 @@ struct RelevanceParser {
 				return nodeContainer {
 					%span(class: "relevance-precondition") {
 						%span(class: "relevance-segment rsg-qs") {
-							(question.label.first?.translation
+							(question.label.firstWhere(datumLanguage)?.translation
 								?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
 						}%
 						%span(class: "relevance-segment rsg-co") {
@@ -309,7 +354,7 @@ struct RelevanceParser {
 						}%
 						if let answer = _answer {
 							%span(class: "relevance-segment rsg-as") {
-								(answer.answerLabel.first?.translation
+								(answer.answerLabel.firstWhere(datumLanguage)?.translation
 									?? #"Answer "\#(capturedQuestionAnswerNameID)" translation not found;"#).spacesToNBSP
 							}%
 						} else {
@@ -328,7 +373,7 @@ struct RelevanceParser {
 				return nodeContainer {
 					%span(class: "relevance-precondition") {
 						%span(class: "relevance-segment rsg-qs") {
-							(question.label.first?.translation ?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
+							(question.label.firstWhere(datumLanguage)?.translation ?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
 						}%
 						%span(class: "relevance-segment rsg-co") {
 							"is".spacesToNBSP
@@ -347,7 +392,7 @@ struct RelevanceParser {
 				return nodeContainer {
 					%span(class: "relevance-precondition") {
 						%span(class: "relevance-segment rsg-qs") {
-							(question.label.first?.translation ?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
+							(question.label.firstWhere(datumLanguage)?.translation ?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
 						}%
 						%span(class: "relevance-segment rsg-co") {
 							capturedOperator.spacesToNBSP
@@ -399,7 +444,7 @@ struct RelevanceParser {
 			return nodeContainer {
 				%span(class: "relevance-precondition") {
 					%span(class: "relevance-segment rsg-qs") {
-						(question.label.first?.translation
+						(question.label.firstWhere(datumLanguage)?.translation
 							?? #"Question "\#(capturedQuestionNameID)" translation not found;"#).spacesToNBSP
 					}%
 					if !capturedTailpiece.isEmpty {
@@ -417,20 +462,41 @@ struct RelevanceParser {
 		// MARK: logicalOperatorsPairsBatch again
 
 		for pair in logicalOperatorsPairsBatch {
-			_r = try _r.replaceMatches(regexPattern: #"\{\{\s("# + pair.replacement + #")\s\}\}"#, replacement: { match in
+			if useSymbols {
+				_r = _r.replacingOccurrences(
+					of: #"{{ "# + pair.replacement + #" }}"#,
+					with: { () -> String in
 
-				let capturedOperator = String(match.values[1] ?? "")
+						let capturedOperator = pair.replacement
 
-				return nodeContainer {
-					%span(class: "relevance-precondition") {
-						" "
-						%span(class: "relevance-segment rsg-lo") {
-							("&nbsp;" + capturedOperator + "&nbsp;").spacesToNBSP
+						return nodeContainer {
+							%span(class: "relevance-precondition") {
+								" "
+								%span(class: "relevance-segment rsg-lo") {
+									("&nbsp;" + capturedOperator + "&nbsp;").spacesToNBSP
+								}%
+								" "
+							}%
+						}.renderAsString()
+					}(),
+					options: [.caseInsensitive, .diacriticInsensitive]
+				)
+			} else {
+				_r = try _r.replaceMatches(regexPattern: #"\{\{\s("# + pair.replacement + #")\s\}\}"#, replacement: { match in
+
+					let capturedOperator = String(match.values[1] ?? "")
+
+					return nodeContainer {
+						%span(class: "relevance-precondition") {
+							" "
+							%span(class: "relevance-segment rsg-lo") {
+								("&nbsp;" + capturedOperator + "&nbsp;").spacesToNBSP
+							}%
+							" "
 						}%
-						" "
-					}%
-				}.renderAsString()
-			})
+					}.renderAsString()
+				})
+			}
 		}
 		stepByStep.append(_r)
 
@@ -485,6 +551,30 @@ fileprivate extension String {
 	var spacesToNBSP: String {
 		false ? self.replacingOccurrences(of: " ", with: "&nbsp;") : self
 	}
+
+	func htmlEscape() -> String {
+		self
+			.replacingOccurrences(of: "&", with: "&amp;") // This must be first.
+			.replacingOccurrences(of: "<", with: "&lt;")
+			.replacingOccurrences(of: ">", with: "&gt;")
+			.replacingOccurrences(of: "\"", with: "&quot;")
+			.replacingOccurrences(of: "'", with: "&apos;")
+	}
+}
+
+
+//--------------------------------------------------
+
+
+extension Array where Element == Survey.LocalizedDatum {
+
+	/// Filters and returns only the common one.
+	fileprivate func firstWhere(_ datumLanguage: Survey.DatumLanguage) -> Survey.LocalizedDatum? {
+		self.first { (localizedDatum: Survey.LocalizedDatum) in
+			localizedDatum.datumLanguage == datumLanguage
+		}
+	}
+
 }
 
 //--------------------------------------------------

@@ -15,8 +15,8 @@ public struct SurveyGroup: Codable, SurveyItemProtocol {
 	public var name: String?
 	public var label: Survey.LocalizedData
 
-	public var relevance: String?
-	public var relevanceStepByStep: [String] // for debugging
+	public var relevance: Survey.LocalizedData?
+	public var relevanceStepByStep: [Survey.LocalizedData] // for debugging
 	public var relevanceUnprocessed: String?
 
 	public var items: [SurveyItem]
@@ -28,8 +28,8 @@ public struct SurveyGroup: Codable, SurveyItemProtocol {
 		name: String?,
 		label: Survey.LocalizedData,
 
-		relevance: String? = nil,
-		relevanceStepByStep: [String] = [],
+		relevance: Survey.LocalizedData? = nil,
+		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil,
 
 		items: [SurveyItem]

@@ -23,8 +23,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
 	public var hint: Survey.LocalizedData
 
-	public var relevance: String?
-	public var relevanceStepByStep: [String] // for debugging
+	public var relevance: Survey.LocalizedData?
+	public var relevanceStepByStep: [Survey.LocalizedData] // for debugging
 	public var relevanceUnprocessed: String?
 
 	//public var `required`
@@ -50,8 +50,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
 		hint: Survey.LocalizedData,
 
-		relevance: String? = nil,
-		relevanceStepByStep: [String] = [],
+		relevance: Survey.LocalizedData? = nil,
+		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil
 	) {
 		self.type = type
@@ -82,8 +82,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
 		hint: Survey.LocalizedData,
 
-		relevance: String? = nil,
-		relevanceStepByStep: [String] = [],
+		relevance: Survey.LocalizedData? = nil,
+		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil
 	) {
 		let typeRawValue = typeRawValue.trimmingCharacters(in: .whitespacesAndNewlines)

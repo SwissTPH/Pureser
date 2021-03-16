@@ -663,16 +663,19 @@ final class ConvertedDocumentPage {
 					table {
 						thead {
 							tr {
-								th(colspan: "2") {
+								th(colspan: "3") {
 									"Relevance step-by-step"
 								}
 							}
 						}
 						tbody {
-							(0..<surveyItem.relevanceStepByStep.count).map { step in
-								tr {
-									td { "\(step)" }
-									td { surveyItem.relevanceStepByStep[step] }
+							(0..<surveyItem.relevanceStepByStep.count).map { x in
+								(0..<surveyItem.relevanceStepByStep[x].count).map { step in
+									tr {
+										td { surveyItem.relevanceStepByStep[x][step].datumLanguage.languageLabel }
+										td { "\(step)" }
+										td { surveyItem.relevanceStepByStep[x][step].translation ?? "" }
+									}
 								}
 							}
 						}
@@ -693,7 +696,13 @@ final class ConvertedDocumentPage {
 				div(class: "relevance") {
 					div {
 						div(class: "faded-l") { "&bull; Relevant when: " }
-						div(class: "faded-d") { surveyItem.relevance ?? Placeholders.unknownRelevance }
+						div(class: "faded-d") {
+							if let relevance = surveyItem.relevance {
+								helper(localizedData: relevance, htmlClass: .groupsAndQuestions, styleCSS: "")
+							} else {
+								Placeholders.unknownRelevance
+							}
+						}
 					}
 				}
 			}

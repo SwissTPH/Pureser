@@ -315,8 +315,10 @@ public struct SurveyParser {
 				if let unprocessedRelevance = question.relevanceUnprocessed, !unprocessedRelevance.isEmpty {
 					let t = try RelevanceParser.relevanceHelper(
 						unprocessedRelevance: unprocessedRelevance,
-						referenceSurveyItems: allSurveyItems
+						referenceSurveyItems: allSurveyItems,
+						datumLanguages: sheets.languagesAvailable.forLabelCluster.inCommon
 					)
+
 					question.relevanceStepByStep = t.stepByStep
 					question.relevance = t.final
 				}
@@ -326,8 +328,10 @@ public struct SurveyParser {
 				if let unprocessedRelevance = group.relevanceUnprocessed, !unprocessedRelevance.isEmpty {
 					let t = try RelevanceParser.relevanceHelper(
 						unprocessedRelevance: unprocessedRelevance,
-						referenceSurveyItems: allSurveyItems
+						referenceSurveyItems: allSurveyItems,
+						datumLanguages: sheets.languagesAvailable.forLabelCluster.inCommon
 					)
+
 					group.relevanceStepByStep = t.stepByStep
 					group.relevance = t.final
 				}
