@@ -45,7 +45,7 @@ public enum SheetsParsingError: Error, CustomStringConvertible {
 		case .surveyWorksheetNotFound:
 			return #"The "survey" worksheet is missing."#
 		case .choicesWorksheetNotFound:
-			return #"The "choice" worksheet is missing."#
+			return #"The "choices" worksheet is missing."#
 		case .settingsWorksheetNotFound:
 			return #"The "settings" worksheet is missing."#
 		case .multipleWorksheetNotFound(let array):
@@ -73,21 +73,21 @@ public enum SheetsParsingError: Error, CustomStringConvertible {
 		case .surveyWorksheetIsEmpty:
 			return #"The "survey" worksheet is blank."#
 		case .choicesWorksheetIsEmpty:
-			return #"The "choice" worksheet is blank."#
+			return #"The "choices" worksheet is blank."#
 		case .settingsWorksheetIsEmpty:
 			return #"The "settings" worksheet is blank."#
 
 		case .surveyWorksheetHeaderRowNotFound:
 			return #"The "survey" worksheet's header row is missing."#
 		case .choicesWorksheetHeaderRowNotFound:
-			return #"The "choice" worksheet's header row is missing."#
+			return #"The "choices" worksheet's header row is missing."#
 		case .settingsWorksheetHeaderRowNotFound:
 			return #"The "settings" worksheet's header row is missing."#
 
 		case .surveyWorksheetContentRowsNotFound:
 			return #"The "survey" worksheet's content rows are missing."#
 		case .choicesWorksheetContentRowsNotFound:
-			return #"The "choice" worksheet's content rows are missing."#
+			return #"The "choices" worksheet's content rows are missing."#
 		case .settingsWorksheetContentRowsNotFound:
 			return #"The "settings" worksheet's content rows are missing."#
 
