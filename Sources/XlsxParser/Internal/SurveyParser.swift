@@ -62,30 +62,16 @@ public struct SurveyParser {
 			}
 
 			// Skip rows where the `type`-titled cell is nil or empty.
-			guard var typeFull = surveySheetRow.type, !typeFull.isEmpty else {
+			guard let typeFull = surveySheetRow.type, !typeFull.isEmpty else {
 				continue
 			}
 
-			//
-			typeFull = try typeFull.replacingMatches(regexPattern: #"\s+"#, withTemplate: " ")
-
-			// Merge different writing styles.
-			for typeCase in SurveyQuestionType.onlyCasesWithKeySynonyms {
-				for synonym in typeCase.keySynonyms {
-					if typeFull == synonym {
-						typeFull = typeFull.replacingOccurrences(of: synonym, with: typeCase.key)
-					} else if typeFull.contains(" ") {
-						var split = typeFull.split(separator: " ")
-						let last = split.removeLast()
-						let rest = split.joined(separator: " ")
-						if rest == synonym {
-							typeFull =
-								rest.replacingOccurrences(of: synonym, with: typeCase.key)
-								+ " " + last
-						}
-					}
-				}
+			// Find type and typeOptions.
+			guard let typeAndOptions: FormQuestionTypeAndOptions = FormQuestionTypeAndOptions(fromString: typeFull) else {
+				throw ParsingError.invalidQuestionTypeOptions(in: typeFull)
 			}
+			let type = typeAndOptions.type
+			let typeOptions: FormQuestionTypeOptions? = typeAndOptions.options
 
 			// Find out the current survey item's orginal label.
 			/// The current survey item's original label, which consists of an array of translations.
@@ -108,10 +94,10 @@ public struct SurveyParser {
 
 			// MARK: - if begin group
 			//
-			if typeFull == SurveyQuestionType.begin_group.rawValue || typeFull == SurveyQuestionType.begin_repeat.rawValue {
+			if [.begin_group, .begin_repeat].contains(type) {
 
 				//
-				let groupType: SurveyGroupType = typeFull == SurveyQuestionType.begin_repeat.rawValue ? .repeatTable : .basic
+				let groupType: SurveyGroupType = type == .begin_repeat ? .repeatTable : .basic
 
 				//
 				var surveyGroupName = surveySheetRow.name
@@ -143,7 +129,7 @@ public struct SurveyParser {
 			}
 			// MARK: - if end group
 			//
-			else if typeFull == SurveyQuestionType.end_group.rawValue || typeFull == SurveyQuestionType.end_repeat.rawValue {
+			else if [.end_group, .end_repeat].contains(type) {
 
 				// If there is an "end group" without begin a "start group".
 				if surveyGroups.isEmpty {
@@ -171,44 +157,23 @@ public struct SurveyParser {
 				//
 				var answers: [SurveySelectionQuestionAnswer] = []
 
-				//
-				var surveyQuestionType = typeFull
-
-				// If there is a space
-				if typeFull.contains(" ") && (
-					typeFull.hasPrefix(SurveyQuestionType.selectOne.rawValue) || typeFull.hasPrefix(SurveyQuestionType.selectMultiple.rawValue) || typeFull.hasPrefix(SurveyQuestionType.rank.rawValue)
-				) {
+				// If it's a question which type needs answers/choices.
+				if [.select_one, .select_multiple, .rank].contains(type) {
 
 					//
-					let typeFullSplit = try typeFull
-						.replacingMatches(regexPattern: #"\s+"#, withTemplate: " ")
-						.split(separator: " ")
-					guard typeFullSplit.count == 2 else {
-						throw ParsingError.invalidQuestionTypeOptions(in: typeFull)
+					guard let choicesSheet = sheets.choices else {
+						throw ParsingError.referenceToChoicesSheetButChoicesWorksheetNotFound(
+							inQuestion: surveySheetRow.name ?? "",
+							questionType: surveySheetRow.type ?? "")
 					}
-					surveyQuestionType = typeFullSplit[0].trimmingCharacters(in: .whitespacesAndNewlines)
-					let surveyQuestionTypeID = typeFullSplit[1].trimmingCharacters(in: .whitespacesAndNewlines)
 
-					if surveyQuestionType == SurveyQuestionType.selectOne.rawValue
-						|| surveyQuestionType == SurveyQuestionType.selectMultiple.rawValue
-						|| surveyQuestionType == SurveyQuestionType.rank.rawValue
-					{
-
-						//
-						guard let choicesSheet = sheets.choices else {
-							throw ParsingError.referenceToChoicesSheetButChoicesWorksheetNotFound(
-								inQuestion: surveySheetRow.name ?? "",
-								questionType: surveySheetRow.type ?? "")
+					// Find out the selection question's answers.
+					answers =
+						choicesSheet.processedContentRows
+						.filter { (choicesSheetRow: ChoicesSheet.Row) in
+							typeOptions?.listName == choicesSheetRow.listName
 						}
-
-						// Find out the selection question's answers.
-						answers = choicesSheet.processedContentRows.filter { (choicesSheetRow: ChoicesSheet.Row) in
-							//
-							let cellStringValue = choicesSheetRow.listName
-
-							//
-							return cellStringValue == surveyQuestionTypeID
-						}.map { (choicesSheetRow: ChoicesSheet.Row) in
+						.map { (choicesSheetRow: ChoicesSheet.Row) in
 							//
 							let answerID = choicesSheetRow.name ?? ""
 
@@ -221,7 +186,6 @@ public struct SurveyParser {
 							//
 							return SurveySelectionQuestionAnswer(answerID: answerID, answerLabel: answerLabel)
 						}
-					}
 				}
 
 				//--------------------------------------------------
@@ -258,7 +222,7 @@ public struct SurveyParser {
 				//--------------------------------------------------
 
 				let surveyQuestion = SurveyQuestion(
-					type: surveyQuestionType,
+					typeAndOptions: typeAndOptions,
 					typeFull: typeFull,
 
 					answers: answers,

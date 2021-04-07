@@ -264,10 +264,18 @@ final class ConvertedDocumentPage {
 						span(class: "faded-d") { surveyQuestion.name }
 						span(class: "faded-l") { "]" }
 
-						if resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+						if resultsLayoutDisplayOptions.displayQuestionAnswerTypeLevel > .none {
 							span {
 								span(class: "faded-l") { "[" }
-								span(class: "faded-d") { surveyQuestion.type.rawValue }
+								span(class: "faded-d") {
+									surveyQuestion.type.rawValue
+									if resultsLayoutDisplayOptions.displayQuestionAnswerTypeLevel >= .detailed, let listName = surveyQuestion.typeOptions?.listName {
+										%nodeContainer { " " + listName }
+									}
+									if resultsLayoutDisplayOptions.displayQuestionAnswerTypeLevel >= .compacted {
+										%(surveyQuestion.typeOptions?.orOther ?? false ? " or_other" : "")
+									}
+								}
 								span(class: "faded-l") { "]" }
 							}
 						}
@@ -414,6 +422,40 @@ final class ConvertedDocumentPage {
 						}
 					// MARK: - START: select.../rank
 					case .select_one, .select_multiple, .rank:
+						func answersTableTr(
+							answerID: String,
+							answerLabel: @autoclosure () -> Node
+						) -> Node {
+							tr {
+								if surveyQuestion.type == .selectOne && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
+									td(class: "answer-input-td") {
+										input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "radio", value: answerID)
+									}
+								}
+								else if surveyQuestion.type == .selectMultiple && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
+									td(class: "answer-input-td") {
+										input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "checkbox", value: answerID)
+									}
+								}
+								else if surveyQuestion.type == .rank && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable/* || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable*/) {
+									td(class: "answer-input-td") {
+										input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, style: "width: 90%;", type: "text", value: "")
+									}
+								}
+
+								if resultsLayoutDisplayOptions.displaySelectAnswersID {
+									td(class: "answer-string-id-td") {
+										span(class: "faded-l") { "[" }
+										span(class: "faded-d") { answerID }
+										span(class: "faded-l") { "]" }
+									}
+								}
+
+								td(class: "answer-text-td") {
+									answerLabel()
+								}
+							}
+						}
 						return nodeContainer {
 							if !surveyQuestion.answers.isEmpty {
 								if true {
@@ -444,40 +486,38 @@ final class ConvertedDocumentPage {
 									table(class: "answers") {
 										tbody {
 											surveyQuestion.answers.map { (surveySelectionQuestionAnswer: SurveySelectionQuestionAnswer) -> Node in nodeContainer {
-												tr {
-													if surveyQuestion.type == .selectOne && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
-														td(class: "answer-input-td") {
-															input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "radio", value: surveySelectionQuestionAnswer.answerID)
-														}
-													}
-													else if surveyQuestion.type == .selectMultiple && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
-														td(class: "answer-input-td") {
-															input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, type: "checkbox", value: surveySelectionQuestionAnswer.answerID)
-														}
-													}
-													else if surveyQuestion.type == .rank && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable/* || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable*/) {
-														td(class: "answer-input-td") {
-															input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput, name: surveyQuestion.name, style: "width: 90%;", type: "text", value: "")
-														}
-													}
 
-													if resultsLayoutDisplayOptions.displaySelectAnswersID {
-														td(class: "answer-string-id-td") {
-															span(class: "faded-l") { "[" }
-															span(class: "faded-d") { surveySelectionQuestionAnswer.answerID }
-															span(class: "faded-l") { "]" }
-														}
-													}
-
-													td(class: "answer-text-td") {
+												answersTableTr(
+													answerID: surveySelectionQuestionAnswer.answerID,
+													answerLabel: nodeContainer {
 														if Settings.Debug.SurveyLocalizedData.surveyQuestionSelectionAnswerLabel {
 															Self.debugHelper(localizedData: surveySelectionQuestionAnswer.answerLabel, debugTitle: "Answer's original label: ")
 														}
 
 														helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
 													}
-												}
+												)
 											}} // end .map & nodeContainer
+
+											if surveyQuestion.typeOptions?.orOther ?? false {
+												answersTableTr(
+													answerID: "other",
+													answerLabel: nodeContainer {
+														div(style: "font-style: italic;text-decoration: underline;") {
+															"Or other:"
+														}
+														div(style: "margin-top: 2pt;") {
+															if false {
+																input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,/* readonly: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,*/ style: "width: -webkit-fill-available;", type: "text", value: "")
+															} else {
+																textarea(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,/* readonly: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,*/ rows: "3", style: "width: -webkit-fill-available;margin-bottom: 0;resize: vertical;"/*, wrap: String?*/) {
+																	%""% // This is for having no indentation between the opening and closing tags of the textarea.
+																}
+															}
+														}
+													}
+												)
+											}
 										}
 									}
 								} else {

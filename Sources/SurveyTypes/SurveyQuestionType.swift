@@ -8,12 +8,15 @@
 import Foundation
 
 
+//@available(*, deprecated, renamed: "FormQuestionType")
+public typealias SurveyQuestionType = FormQuestionType
+
 /// Form Question Types.
 /// Adapted to question types of the XLSForm standard.
 ///
 /// These are put into the "type" column.
 ///
-public enum SurveyQuestionType: String, Codable, CaseIterable {
+public enum FormQuestionType: String, Codable, CaseIterable {
 
 
 	// MARK: - Unknown type
@@ -118,6 +121,8 @@ public enum SurveyQuestionType: String, Codable, CaseIterable {
 	/// Multiple choice question; only one answer can be selected.
 	///
 	/// - Syntax: `select_one [options]`
+	///     - `select_one [choices] [or_other]`
+	///     - `select_one [list_name] [or_other]`
 	/// - Synonyms: `select one [options]`.
 	///
 	case select_one = "select_one"
@@ -127,6 +132,8 @@ public enum SurveyQuestionType: String, Codable, CaseIterable {
 	/// Multiple choice question; multiple answers can be selected.
 	///
 	/// - Syntax: `select_multiple [options]`
+	///     - `select_multiple [choices] [or_other]`
+	///     - `select_multiple [list_name] [or_other]`
 	/// - Synonyms: `select multiple [options]`.
 	///
 	/// Examples:
@@ -338,6 +345,35 @@ public enum SurveyQuestionType: String, Codable, CaseIterable {
 	//
 	public static var hiddenQuestionTypes: [Self] {
 		metaQuestionTypes + [.calculate]
+	}
+
+
+	// MARK: - is...
+
+	/// Whether it is a question type that needs options.
+	///
+	/// Matches these `enum` `case`s:
+	/// - `.select_one`
+	/// - `.select_multiple`
+	/// - `.rank`
+	/// - `.select_one_from_file`
+	/// - `.select_multiple_from_file`
+	///
+	/// For example:
+	/// - `select_one [options]`
+	/// - `rank [options]`
+	///
+	public var isQuestionTypeWithOptions: Bool {
+		switch self {
+		case .select_one,
+			 .select_multiple,
+			 .rank,
+			 .select_one_from_file,
+			 .select_multiple_from_file:
+			return true
+		default:
+			return false
+		}
 	}
 
 
@@ -586,10 +622,6 @@ public enum SurveyQuestionType: String, Codable, CaseIterable {
 		self.info.allKeySynonyms
 	}
 
-	public static var onlyCasesWithKeySynonyms: Self.AllCases {
-		Self.allCases.filter { c in !c.info.allKeySynonyms.isEmpty }
-	}
-
 
 	// MARK: - struct ItemInfo
 
@@ -618,6 +650,28 @@ public enum SurveyQuestionType: String, Codable, CaseIterable {
 		public var allPossibleKeys: [String] {
 			[key] + keySynonyms + undocumentedKeySynonyms
 		}
+	}
+
+
+	// MARK: - init
+
+	/// Initialize from any possible key or synonym.
+	/// Note: *type-options* (e.g. `list_name`) should not be included in the input `String`.
+	///
+	/// This overrides the default `init?(rawValue: String)`.
+	///
+	/// If there is no value of the type that corresponds with the specified raw value, this initializer returns nil.
+	///
+	/// - Parameters:
+	///     - rawValue: The raw value to use for the new instance.
+	///
+	public init?(/*fromAnyPossibleKey */rawValue: String) {
+		guard let value = FormQuestionType.allCases
+				.first(where: { typeCase in typeCase.info.allPossibleKeys.contains(rawValue) })
+		else {
+			return nil
+		}
+		self = value
 	}
 
 

@@ -11,7 +11,23 @@ import Foundation
 
 public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
-	public var type: SurveyQuestionType
+	private var typeAndOptions: FormQuestionTypeAndOptions
+	public var type: SurveyQuestionType {
+		get {
+			typeAndOptions.type
+		}
+		set {
+			typeAndOptions.type = newValue
+		}
+	}
+	public var typeOptions: FormQuestionTypeOptions? {
+		get {
+			typeAndOptions.options
+		}
+		set {
+			typeAndOptions.options = newValue
+		}
+	}
 	public var typeFull: String
 
 	public var answers: [SurveySelectionQuestionAnswer]
@@ -39,7 +55,7 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 	//public var read_only
 
 	public init(
-		type: SurveyQuestionType,
+		typeAndOptions: FormQuestionTypeAndOptions,
 		typeFull: String,
 
 		answers: [SurveySelectionQuestionAnswer],
@@ -54,7 +70,7 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil
 	) {
-		self.type = type
+		self.typeAndOptions = typeAndOptions
 		self.typeFull = typeFull
 
 		self.answers = answers
@@ -68,43 +84,6 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 		self.relevance = relevance
 		self.relevanceStepByStep = relevanceStepByStep
 		self.relevanceUnprocessed = relevanceUnprocessed
-	}
-
-	public init(
-		type typeRawValue: String,
-		typeFull: String,
-
-		answers: [SurveySelectionQuestionAnswer],
-		name: String,
-
-		label: Survey.LocalizedData,
-		labelFull: Survey.LocalizedData,
-
-		hint: Survey.LocalizedData,
-
-		relevance: Survey.LocalizedData? = nil,
-		relevanceStepByStep: [Survey.LocalizedData] = [],
-		relevanceUnprocessed: String? = nil
-	) {
-		let typeRawValue = typeRawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-		let type = SurveyQuestionType(rawValue: typeRawValue) ?? .unknown
-
-		self.init(
-			type: type,
-			typeFull: typeFull,
-
-			answers: answers,
-			name: name,
-
-			label: label,
-			labelFull: labelFull,
-
-			hint: hint,
-
-			relevance: relevance,
-			relevanceStepByStep: relevanceStepByStep,
-			relevanceUnprocessed: relevanceUnprocessed
-		)
 	}
 
 }
