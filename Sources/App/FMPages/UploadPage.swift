@@ -109,6 +109,47 @@ struct UploadPage {
 							text-align: center;
 							margin: auto auto;
 						}
+
+						#choose-file-f-m {
+							font-style: italic;
+							font-size: 11pt;
+							color: #555;
+						}
+						"""
+					}
+					//--------------------------------------------------
+
+					//--------------------------------------------------
+					script {
+						"""
+						window.onload = function () {
+
+							const fileInput = document.querySelector('form#cf-form input[type=file]');
+							const submitButton = document.querySelector('form#cf-form input[type=submit]');
+							const chooseFileFM = document.querySelector('#choose-file-f-m');
+
+							fileInput.addEventListener("change", function(event) {
+								if (fileInput.files.length > 0) {
+									// const fileName = fileInput.files[0].name;
+									chooseFileFM.style.display = 'none';
+								} else {
+									chooseFileFM.style.display = 'block';
+								}
+							});
+
+							submitButton.addEventListener("click", function(event) {
+								if (fileInput.files.length == 0) {
+									if (chooseFileFM.style.display == 'none') {
+										chooseFileFM.style.display = 'block';
+										event.preventDefault();
+									} else if (chooseFileFM.style.display == 'block') {
+										alert(chooseFileFM.innerText);
+										event.preventDefault();
+									}
+								}
+							});
+
+						}
 						"""
 					}
 					//--------------------------------------------------
@@ -123,7 +164,7 @@ struct UploadPage {
 
 						br()
 
-						form(action: formAction, enctype: "multipart/form-data", method: "POST") {
+						form(action: formAction, enctype: "multipart/form-data", id: "cf-form", method: "POST") {
 
 							div {
 								input(accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", class: "input-f", name: UploadPageFormData.FormInputName.xlsxFile, type: "file")
@@ -173,6 +214,10 @@ struct UploadPage {
 
 							div {
 								input(class: "s-input", id: "", type: "submit", value: "Convert!")
+
+								div(id: "choose-file-f-m", style: "display: none;") {
+									"Must choose a file in order to convert."
+								}
 							}
 						}
 
