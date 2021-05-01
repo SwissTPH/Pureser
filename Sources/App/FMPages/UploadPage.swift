@@ -183,6 +183,13 @@ struct UploadPage {
 								}
 							}
 						}
+
+						// Logos
+						if true {
+							div(style: "margin-top: 50pt;") {
+								LogosBlock.html
+							}
+						}
 					}
 					//--------------------------------------------------
 

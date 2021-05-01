@@ -1365,6 +1365,14 @@ final class ConvertedDocumentPage {
 
 					//--------------------------------------------------
 					div(style: "margin: 35px auto;width: 800px;padding: 2px;") {
+
+						// Logos
+						if true {
+							div(style: "margin-bottom: 35pt;") {
+								LogosBlock.html
+							}
+						}
+
 						div(class: "tools") {
 							a(href: "/") {
 								input(class: "tool-button", id: "", name: "", style: "", title: "", type: "button", value: "⬅️ Back")
