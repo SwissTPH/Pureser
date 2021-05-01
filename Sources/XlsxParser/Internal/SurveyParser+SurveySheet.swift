@@ -27,6 +27,7 @@ public struct SurveySheet {
 		//static var constraint = "constraint"
 		//static var constraintMessageCluster = "constraint_message"
 		//static var readOnly = "read_only"
+		//static var choiceFilter = "choice_filter"
 	}
 
 	public struct Row: Codable {
@@ -43,6 +44,7 @@ public struct SurveySheet {
 		var constraint: String?
 		var constraintMessageCluster: Survey.LocalizedData?
 		var readOnly: String?
+		var choiceFilter: String?
 
 		enum CodingKeys: String, CodingKey {
 			case type = "type"
@@ -58,6 +60,7 @@ public struct SurveySheet {
 			case constraint = "constraint"
 			case constraintMessageCluster = "constraint_message"
 			case readOnly = "read_only"
+			case choiceFilter = "choice_filter"
 		}
 
 		internal init(
@@ -73,7 +76,8 @@ public struct SurveySheet {
 			default: String? = nil,
 			constraint: String? = nil,
 			constraintMessageCluster: Survey.LocalizedData? = nil,
-			readOnly: String? = nil
+			readOnly: String? = nil,
+			choiceFilter: String? = nil
 		) {
 			self.type = type
 			self.name = name
@@ -88,6 +92,7 @@ public struct SurveySheet {
 			self.constraint = constraint
 			self.constraintMessageCluster = constraintMessageCluster
 			self.readOnly = readOnly
+			self.choiceFilter = choiceFilter
 		}
 
 		internal var isVacant: Bool {
@@ -104,6 +109,7 @@ public struct SurveySheet {
 				&& constraint?.isEmpty ?? true
 				&& constraintMessageCluster?.isVacant ?? true
 				&& readOnly?.isEmpty ?? true
+				&& choiceFilter?.isEmpty ?? true
 		}
 
 		internal var nilIfVacant: Self? {
@@ -125,6 +131,7 @@ public struct SurveySheet {
 		var constraint: CoreXLSX.ColumnReference?
 		var constraintMessageCluster: ColumnClusterReference?
 		var readOnly: CoreXLSX.ColumnReference?
+		var choiceFilter: CoreXLSX.ColumnReference?
 	}
 
 	/// Header row.
@@ -210,7 +217,9 @@ public struct SurveySheet {
 
 			constraintMessageCluster: try? getter.findColumnReferences(titleContaining: Row.CodingKeys.constraintMessageCluster.rawValue),
 
-			readOnly: try? getter.findColumnReference(Row.CodingKeys.readOnly.rawValue)
+			readOnly: try? getter.findColumnReference(Row.CodingKeys.readOnly.rawValue),
+
+			choiceFilter: try? getter.findColumnReference(Row.CodingKeys.choiceFilter.rawValue)
 		)
 
 		//
@@ -229,7 +238,8 @@ public struct SurveySheet {
 				default: getter.findTrimmedPlainString(in: row, by: columnReferences.default),
 				constraint: getter.findTrimmedPlainString(in: row, by: columnReferences.constraint),
 				constraintMessageCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.constraintMessageCluster),
-				readOnly: getter.findTrimmedPlainString(in: row, by: columnReferences.readOnly)
+				readOnly: getter.findTrimmedPlainString(in: row, by: columnReferences.readOnly),
+				choiceFilter: getter.findTrimmedPlainString(in: row, by: columnReferences.choiceFilter)
 			)
 		}
 

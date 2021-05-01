@@ -77,6 +77,11 @@ struct ResultsLayoutDisplayOptions {
 	/// Skip (do not show) questions with Question ID containing "_check" AND is of "note" question type.
 	let skipQuestionsWithPatternC: Bool
 
+
+
+	/// The control for the display of question's and answers' choice filter related information.
+	let displayChoiceFilter: DisplayQuestionAndAnswerChoiceFilter
+
 }
 
 extension ResultsLayoutDisplayOptions {
@@ -132,6 +137,27 @@ extension ResultsLayoutDisplayOptions {
 		#endif
 	}
 
+	/// The control options for the display of question's and answers' choice filter related information.
+	///
+	enum DisplayQuestionAndAnswerChoiceFilter: Equatable {
+		/// Will not display question's and answers' choice filter related information.
+		case none
+
+		/// In case the question and its answers have choice filter/s,
+		/// display the answer list when the count of answes is up to the specified `limit`,
+		/// otherwise, omit the answer list and display a textfield instead.
+		case upToLimitOtherwiseTextField(limit: Int)
+		var upToLimit: Int? {
+			if case .upToLimitOtherwiseTextField(limit: let limit) = self {
+				return limit
+			}
+			return nil
+		}
+
+		/// Will display detailed question's and answers' choice filter related information.
+		case detailed
+	}
+
 }
 
 //--------------------------------------------------
@@ -158,7 +184,9 @@ extension ResultsLayoutDisplayOptions {
 			displaySelectInputInsideRepeatTable: false,
 
 			skipQuestionWithType: [],
-			skipQuestionsWithPatternC: false
+			skipQuestionsWithPatternC: false,
+
+			displayChoiceFilter: .detailed
 		)
 
 		static var dataManager = ResultsLayoutDisplayOptions(
@@ -180,7 +208,9 @@ extension ResultsLayoutDisplayOptions {
 			displaySelectInputInsideRepeatTable: false,
 
 			skipQuestionWithType: [.calc],
-			skipQuestionsWithPatternC: true
+			skipQuestionsWithPatternC: true,
+
+			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10)
 		)
 
 		static var interviewer = ResultsLayoutDisplayOptions(
@@ -202,7 +232,9 @@ extension ResultsLayoutDisplayOptions {
 			displaySelectInputInsideRepeatTable: false,
 
 			skipQuestionWithType: [.calc],
-			skipQuestionsWithPatternC: true
+			skipQuestionsWithPatternC: true,
+
+			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10)
 		)
 
 	}

@@ -258,6 +258,18 @@ final class ConvertedDocumentPage {
 					// Question's relevance.
 					relevanceHelper(surveyItem: surveyQuestion)
 
+					// Question's choiceFilter.
+					if resultsLayoutDisplayOptions.displayChoiceFilter == .detailed && surveyQuestion.hasChoiceFilters, let choiceFilter = surveyQuestion.choiceFilterUnprocessed {
+						div(class: "question-choice-filter") {
+							div {
+								div(class: "faded-l") { "&bull; Choice filter: " }
+								div(class: "faded-d") {
+									choiceFilter
+								}
+							}
+						}
+					}
+
 					// Question's info, e.g. question nameID and type.
 					div {
 						span(class: "faded-l") { "[" }
@@ -424,7 +436,8 @@ final class ConvertedDocumentPage {
 					case .select_one, .select_multiple, .rank:
 						func answersTableTr(
 							answerID: String,
-							answerLabel: @autoclosure () -> Node
+							answerLabel: @autoclosure () -> Node,
+							answerChoiceFilters: [ChoiceFilter]? = nil
 						) -> Node {
 							tr {
 								if surveyQuestion.type == .selectOne && resultsLayoutDisplayOptions.fillingOutSurveyMode && (!currentlyInsideRepeatTable || currentlyInsideRepeatTable && resultsLayoutDisplayOptions.displaySelectInputInsideRepeatTable) {
@@ -454,69 +467,99 @@ final class ConvertedDocumentPage {
 								td(class: "answer-text-td") {
 									answerLabel()
 								}
+
+								if resultsLayoutDisplayOptions.displayChoiceFilter == .detailed && surveyQuestion.hasAnswersWithChoiceFilters {
+									td(class: "answer-cf-td", style: "white-space: nowrap;") {
+										if let answerChoiceFilters = answerChoiceFilters {
+											answerChoiceFilters.map { choiceFilter in
+												div {
+													choiceFilter.name + " = " + choiceFilter.value
+												}
+											}
+										}
+									}
+								}
+							} // end tr
+						} // end func
+						let textField: Node = nodeContainer {
+							if false {
+								input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,/* readonly: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,*/ style: "width: -webkit-fill-available;", type: "text", value: "")
+							} else {
+								textarea(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,/* readonly: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,*/ rows: "3", style: "width: -webkit-fill-available;margin-bottom: 0;resize: vertical;"/*, wrap: String?*/) {
+									%""% // This is for having no indentation between the opening and closing tags of the textarea.
+								}
 							}
 						}
 						return nodeContainer {
 							if !surveyQuestion.answers.isEmpty {
 								if true {
-									if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-										if surveyQuestion.type == .selectOne && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectOne) {
-											div(class: "faded-dd") {
-												if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
-													"Choose only one option:"
-												} else {
-													"Select one:"
-												}
-											}
-										} else if surveyQuestion.type == .selectMultiple && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectMultiple) {
-											div(class: "faded-dd") {
-												if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
-													"Choose one or more options:"
-												} else {
-													"Select multiple:"
-												}
-											}
-										} else if surveyQuestion.type == .rank && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.rank) {
-											div(class: "faded-dd") {
-												"Rank the following options:"
+									if case .upToLimitOtherwiseTextField = resultsLayoutDisplayOptions.displayChoiceFilter, let upToLimit = resultsLayoutDisplayOptions.displayChoiceFilter.upToLimit, surveyQuestion.hasChoiceFilters, surveyQuestion.answers.count > upToLimit {
+
+										div(class: "question-choice-filter-note") {
+											"The choice list of this question (comprising \(surveyQuestion.answers.count) choice\(surveyQuestion.answers.count > 1 ? "s" : "")) was replaced with a text field due to this question having choice filter and more than \(upToLimit) choices."
+										}
+										textField
+									} else {
+										if false, resultsLayoutDisplayOptions.displayChoiceFilter == .none && surveyQuestion.hasChoiceFilters {
+											div(class: "question-choice-filter-note") {
+												"This question has choice filter."
 											}
 										}
-									}
 
-									table(class: "answers") {
-										tbody {
-											surveyQuestion.answers.map { (surveySelectionQuestionAnswer: SurveySelectionQuestionAnswer) -> Node in nodeContainer {
-
-												answersTableTr(
-													answerID: surveySelectionQuestionAnswer.answerID,
-													answerLabel: nodeContainer {
-														if Settings.Debug.SurveyLocalizedData.surveyQuestionSelectionAnswerLabel {
-															Self.debugHelper(localizedData: surveySelectionQuestionAnswer.answerLabel, debugTitle: "Answer's original label: ")
-														}
-
-														helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
+										if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+											if surveyQuestion.type == .selectOne && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectOne) {
+												div(class: "faded-dd") {
+													if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
+														"Choose only one option:"
+													} else {
+														"Select one:"
 													}
-												)
-											}} // end .map & nodeContainer
+												}
+											} else if surveyQuestion.type == .selectMultiple && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.selectMultiple) {
+												div(class: "faded-dd") {
+													if resultsLayoutDisplayOptions.displaySelectTermMoreHumanReadable {
+														"Choose one or more options:"
+													} else {
+														"Select multiple:"
+													}
+												}
+											} else if surveyQuestion.type == .rank && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.rank) {
+												div(class: "faded-dd") {
+													"Rank the following options:"
+												}
+											}
+										}
 
-											if surveyQuestion.typeOptions?.orOther ?? false {
-												answersTableTr(
-													answerID: "other",
-													answerLabel: nodeContainer {
-														div(style: "font-style: italic;text-decoration: underline;") {
-															"Or other:"
-														}
-														div(style: "margin-top: 2pt;") {
-															if false {
-																input(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,/* readonly: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,*/ style: "width: -webkit-fill-available;", type: "text", value: "")
-															} else {
-																textarea(disabled: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,/* readonly: resultsLayoutDisplayOptions.readonlyAnswerSelectionInput,*/ rows: "3", style: "width: -webkit-fill-available;margin-bottom: 0;resize: vertical;"/*, wrap: String?*/) {
-																	%""% // This is for having no indentation between the opening and closing tags of the textarea.
-																}
+										table(class: "answers") {
+											tbody {
+												surveyQuestion.answers.map { (surveySelectionQuestionAnswer: SurveySelectionQuestionAnswer) -> Node in nodeContainer {
+
+													answersTableTr(
+														answerID: surveySelectionQuestionAnswer.answerID,
+														answerLabel: nodeContainer {
+															if Settings.Debug.SurveyLocalizedData.surveyQuestionSelectionAnswerLabel {
+																Self.debugHelper(localizedData: surveySelectionQuestionAnswer.answerLabel, debugTitle: "Answer's original label: ")
+															}
+
+															helper(localizedData: surveySelectionQuestionAnswer.answerLabel, htmlClass: .selectionAnswers, styleCSS: "")
+														},
+														answerChoiceFilters: surveySelectionQuestionAnswer.choiceFilters
+													)
+												}} // end .map & nodeContainer
+
+												if surveyQuestion.typeOptions?.orOther ?? false {
+													answersTableTr(
+														answerID: "other",
+														answerLabel: nodeContainer {
+															div(style: "font-style: italic;text-decoration: underline;") {
+																"Or other:"
+															}
+															div(style: "margin-top: 2pt;") {
+																textField
 															}
 														}
-													}
-												)
+													)
+												}
 											}
 										}
 									}
@@ -1214,6 +1257,19 @@ final class ConvertedDocumentPage {
 				"""
 			)
 		}
+
+		_pageCSS.append(
+			"""
+			.question-choice-filter > div {
+				margin-bottom: 20px;
+			}
+
+			.question-choice-filter-note {
+				color: #555;
+				font-size: 11pt;
+			}
+			"""
+		)
 
 		_pageCSS.append(
 			"""

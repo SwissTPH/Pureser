@@ -54,6 +54,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 	//
 	//public var read_only
 
+	public var choiceFilterUnprocessed: String?
+
 	public init(
 		typeAndOptions: FormQuestionTypeAndOptions,
 		typeFull: String,
@@ -68,7 +70,9 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
 		relevance: Survey.LocalizedData? = nil,
 		relevanceStepByStep: [Survey.LocalizedData] = [],
-		relevanceUnprocessed: String? = nil
+		relevanceUnprocessed: String? = nil,
+
+		choiceFilterUnprocessed: String?
 	) {
 		self.typeAndOptions = typeAndOptions
 		self.typeFull = typeFull
@@ -84,6 +88,26 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 		self.relevance = relevance
 		self.relevanceStepByStep = relevanceStepByStep
 		self.relevanceUnprocessed = relevanceUnprocessed
+
+		self.choiceFilterUnprocessed = choiceFilterUnprocessed
+
+	}
+
+}
+
+//--------------------------------------------------
+
+extension SurveyQuestion {
+
+	/// Whether this question has any answer with choice filters.
+	public var hasAnswersWithChoiceFilters: Bool {
+		self.answers.hasChoiceFilters
+	}
+
+	/// Whether this question and it's answers are with choice filters.
+	public var hasChoiceFilters: Bool {
+		!(self.choiceFilterUnprocessed?.isEmpty ?? true)
+			&& self.hasAnswersWithChoiceFilters
 	}
 
 }

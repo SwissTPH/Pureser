@@ -184,7 +184,11 @@ public struct SurveyParser {
 							let answerLabel = translations
 
 							//
-							return SurveySelectionQuestionAnswer(answerID: answerID, answerLabel: answerLabel)
+							return SurveySelectionQuestionAnswer(
+								answerID: answerID,
+								answerLabel: answerLabel,
+								choiceFilters: choicesSheetRow.choiceFilters
+							)
 						}
 				}
 
@@ -234,7 +238,9 @@ public struct SurveyParser {
 
 					hint: surveyQuestionHint,
 
-					relevanceUnprocessed: surveyItemRelevanceUnprocessed
+					relevanceUnprocessed: surveyItemRelevanceUnprocessed,
+
+					choiceFilterUnprocessed: surveySheetRow.choiceFilter
 				)
 
 				// Add the current question to either (1) survey's items array, or (2) parent-group's items array.

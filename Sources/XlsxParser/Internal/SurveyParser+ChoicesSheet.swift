@@ -8,6 +8,7 @@
 import Foundation
 import CoreXLSX
 import struct SurveyTypes.Survey
+import struct SurveyTypes.ChoiceFilter
 
 //--------------------------------------------------
 
@@ -23,27 +24,32 @@ public struct ChoicesSheet {
 		var listName: String?
 		var name: String?
 		var labelCluster: Survey.LocalizedData?
+		var choiceFilters: [ChoiceFilter]?
 
 		enum CodingKeys: String, CodingKey {
 			case listName = "list_name"
 			case name = "name"
 			case labelCluster = "label"
+			case choiceFilters = "choiceFilters"
 		}
 
 		internal init(
 			listName: String? = nil,
 			name: String? = nil,
-			labelCluster: Survey.LocalizedData? = nil
+			labelCluster: Survey.LocalizedData? = nil,
+			choiceFilters: [ChoiceFilter]? = nil
 		) {
 			self.listName = listName
 			self.name = name
 			self.labelCluster = labelCluster
+			self.choiceFilters = choiceFilters
 		}
 
 		internal var isVacant: Bool {
 			return listName?.isEmpty ?? true
 				&& name?.isEmpty ?? true
 				&& labelCluster?.isVacant ?? true
+				&& choiceFilters?.isEmpty ?? true
 		}
 
 		internal var nilIfVacant: Self? {
@@ -110,6 +116,56 @@ public struct ChoicesSheet {
 			throw SheetsParser.ParsingError.choicesWorksheetContentRowsNotFound
 		}
 
+		// Detect the header cells of columns with user-defined titles used
+		// with `"choice_filter"` column in the survey worksheet.
+		// More info: https://docs.getodk.org/form-logic/#filtering-options-in-select-questions
+		let choiceFilterHeaderCells: [CoreXLSX.Cell]
+		do {
+			let knownColumnTitles: [String] = [
+				ColumnsPossibleTitles.listName,
+				[Row.CodingKeys.name.rawValue],
+			].flatMap { $0 }
+
+			let knownClusterColumnTitles: [String] = [
+				[Row.CodingKeys.labelCluster.rawValue],
+			].flatMap { $0 }
+
+			func isAKnownColumnTitle(_ title: String) -> Bool {
+				return
+					knownColumnTitles.contains(title) ||
+					knownClusterColumnTitles.contains { c in title == c || title.hasPrefix("\(c)::") }
+			}
+
+			choiceFilterHeaderCells = headerRow.cells.filter { (cell: CoreXLSX.Cell) in
+				guard
+					let t = cell.trimmedPlainString(sharedStrings: sharedStrings),
+					!t.isEmpty
+				else {
+					return false
+				}
+
+				return !isAKnownColumnTitle(t)
+			}
+		}
+		//
+		func choiceFiltersHelper(in contentRow: CoreXLSX.Row, using getter: Getter) -> [ChoiceFilter]? {
+			choiceFilterHeaderCells.isEmpty ? nil : choiceFilterHeaderCells.compactMap {
+				(cell: CoreXLSX.Cell) in
+
+				// The column reference of the current header cell.
+				let columnReference = cell.reference.column
+
+				guard
+					let name = cell.trimmedPlainString(sharedStrings: sharedStrings),
+					let value = getter.findTrimmedPlainString(in: contentRow, by: columnReference)
+				else {
+					return nil
+				}
+
+				return ChoiceFilter(name: name, value: value)
+			}
+		}
+
 		// Assign getter.
 		let getter = Getter(sharedStrings: sharedStrings, headerRow: headerRow, inWorksheet: .choices)
 
@@ -129,7 +185,8 @@ public struct ChoicesSheet {
 			Row(
 				listName: getter.findTrimmedPlainString(in: row, by: columnReferences.listName),
 				name: getter.findTrimmedPlainString(in: row, by: columnReferences.name),
-				labelCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.labelCluster)
+				labelCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.labelCluster),
+				choiceFilters: choiceFiltersHelper(in: row, using: getter)
 			)
 		}
 
