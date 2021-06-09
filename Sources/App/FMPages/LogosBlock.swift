@@ -59,10 +59,6 @@ enum LogosBlock {
 			name: "Bloomberg Philanlanthropies - Data For Health Initiative",
 			image: logosDir + "BloombergPhilanlanthropies_DataForHealthInitiative_Logo_RGB.jpg"
 		),
-		Logo(
-			name: "World Health Organization",
-			image: logosDir + "World-Health-Organization-WHO-Logo.png"
-		),
 	]
 
 
@@ -87,9 +83,6 @@ enum LogosBlock {
 			width: 140pt;
 			height: 70pt;
 		}
-		.logos-4m28 .logos-4m28-row img {
-			margin:auto 8pt;
-		}
 		"""
 		}
 		div(class: "logos-4m28") {
@@ -102,11 +95,6 @@ enum LogosBlock {
 				}
 				div {
 					logos[2].imgHTMLTag(class: "", style: "width: 140pt;")
-				}
-			}
-			div(class: "logos-4m28-row", style: "margin-top: -18pt;") {
-				div {
-					logos[3].imgHTMLTag(class: "", style: "width: 130pt;")
 				}
 			}
 		}

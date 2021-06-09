@@ -367,7 +367,7 @@ struct RelevanceParser {
 
 			}
 			//
-			else if questionOfTypeCalcWithPatternIsAsTypeBoolean && question.type == .calc && question.name.lowercased().hasPrefix("is") && ["0", "1"].contains(capturedQuestionAnswerNameID) {
+            else if questionOfTypeCalcWithPatternIsAsTypeBoolean && question.type == .calculate && question.name.lowercased().hasPrefix("is") && ["0", "1"].contains(capturedQuestionAnswerNameID) {
 
 				//
 				return nodeContainer {

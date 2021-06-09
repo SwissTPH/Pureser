@@ -198,7 +198,7 @@ extension ResultsLayoutDisplayOptions {
 			displayOriginalQuestionLabelForDebugging: false,
 
 			displayQuestionAnswerTypeLevel: .compacted, // .detailed,
-			hideTheseQuestionAnswerType: [.integer, .decimal, .calc, .note, .text],
+            hideTheseQuestionAnswerType: [.integer, .decimal, .calculate, .note, .text],
 
 			displaySelectAnswersID: true,
 			displaySelectTermMoreHumanReadable: false,
@@ -207,7 +207,7 @@ extension ResultsLayoutDisplayOptions {
 			readonlyAnswerSelectionInput: true,
 			displaySelectInputInsideRepeatTable: false,
 
-			skipQuestionWithType: [.calc],
+            skipQuestionWithType: [.calculate],
 			skipQuestionsWithPatternC: true,
 
 			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10)
@@ -222,7 +222,7 @@ extension ResultsLayoutDisplayOptions {
 			displayOriginalQuestionLabelForDebugging: false,
 
 			displayQuestionAnswerTypeLevel: .none,
-			hideTheseQuestionAnswerType: [.integer, .decimal, .calc, .note, .text],
+            hideTheseQuestionAnswerType: [.integer, .decimal, .calculate, .note, .text],
 
 			displaySelectAnswersID: false,
 			displaySelectTermMoreHumanReadable: true,
