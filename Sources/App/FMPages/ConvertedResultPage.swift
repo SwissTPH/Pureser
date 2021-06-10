@@ -174,7 +174,7 @@ final class ConvertedDocumentPage {
 								}
 								(1...defualtRepeatCount).map { x in
 									th {
-										"Person \(x)"
+										"Element \(x)"
 									}
 								}
 							}
