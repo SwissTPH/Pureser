@@ -24,7 +24,7 @@ let package = Package(
 
 		//--------------------------------------------------
 
-		.package(name: "HTML", url: "https://github.com/robb/Swim.git", .branch("main")),
+		.package(name: "HTML", url: "https://github.com/robb/Swim.git", from: "0.1.1"),
 
 		//--------------------------------------------------
 
