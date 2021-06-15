@@ -100,6 +100,9 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	///
 	case integer = "integer"
 
+    /// Integer (i.e., whole number) input.
+    ///
+    case int = "int"
 	/// Decimal input.
 	///
 	case decimal = "decimal"
@@ -150,6 +153,10 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	///
 	case select_one_from_file = "select_one_from_file"
 
+    /// `select_one_external [file]`
+    ///
+    case select_one_external = "select_one_external"
+    
 	/// Multiple choice from file; multiple answers can be selected.
 	///
 	/// `select_multiple_from_file [file]`
@@ -193,6 +200,9 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	///
 	case dateTime = "dateTime"
 
+    /// Accepts a date and a time input.
+    ///
+    case datetime = "datetime"
 	/// Take a picture or upload an image file.
 	///
 	/// - Syntax: `image`
@@ -290,12 +300,14 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	public static var regularQuestionTypes: [Self] {
 		[
 			.integer,
+            .int,
 			.decimal,
 			.range,
 			.text,
 			.select_one,
 			.select_multiple,
 			.select_one_from_file,
+            .select_one_external,
 			.select_multiple_from_file,
 			.rank,
 			.note,
@@ -305,6 +317,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 			.date,
 			.time,
 			.dateTime,
+            .datetime,
 			.image,
 			.audit,
 			.video,
@@ -447,6 +460,11 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 				item: .integer,
 				key: "integer"
 			)
+        case .int:
+            o = ItemInfo(
+                item: .int,
+                key: "int"
+            )
 		case .decimal:
 			o = ItemInfo(
 				item: .decimal,
@@ -481,7 +499,12 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 				item: .select_one_from_file,
 				key: "select_one_from_file"
 			)
-		case .select_multiple_from_file:
+        case .select_one_external:
+            o = ItemInfo(
+                item: .select_one_external,
+                key: "select_one_external"
+            )
+        case .select_multiple_from_file:
 			o = ItemInfo(
 				item: .select_multiple_from_file,
 				key: "select_multiple_from_file"
@@ -528,7 +551,12 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 				item: .dateTime,
 				key: "dateTime"
 			)
-		case .image:
+        case .datetime:
+            o = ItemInfo(
+                item: .datetime,
+                key: "datetime"
+            )
+        case .image:
 			o = ItemInfo(
 				item: .image,
 				key: "image",
