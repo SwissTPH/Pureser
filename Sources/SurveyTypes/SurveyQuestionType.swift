@@ -16,7 +16,7 @@ public typealias SurveyQuestionType = FormQuestionType
 ///
 /// These are put into the "type" column.
 ///
-public enum FormQuestionType: String, Codable, CaseIterable {
+public enum FormQuestionType: RawRepresentable, Codable, CaseIterable {
 
 
 	// MARK: - Unknown type
@@ -33,22 +33,22 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 
 	/// Start date and time of the survey.
 	///
-	case start = "start"
+	case start
 
 	/// End date and time of the survey.
 	///
-	case end = "end"
+	case end
 
 	/// Day of the survey.
 	///
-	case today = "today"
+	case today
 
 	/// Unique client identifier. Can be user-reset.
 	///
 	/// - Syntax: `deviceid`.
 	/// - Synonyms: `imei`.
 	///
-	case deviceid = "deviceid"
+	case deviceid
 	@available(*, deprecated, renamed: "deviceid")
 	public static let deviceID: Self = .deviceid
 
@@ -57,21 +57,21 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - Syntax: `phonenumber`.
 	/// - Synonyms: `phone_number`.
 	///
-	case phonenumber = "phonenumber"
+	case phonenumber
 	@available(*, deprecated, renamed: "phonenumber")
 	public static let phoneNumber: Self = .phonenumber
 
 	/// Username configured (if available).
 	///
-	case username = "username"
+	case username
 
 	/// Email address configured (if available).
 	///
-	case email = "email"
+	case email
 
 	/// Log enumerator behavior during data entry
 	///
-	case audit = "audit"
+	case audit
 
 	/// The geolocation when the survey was started.
 	///
@@ -83,13 +83,19 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// Although it is possible to have more than one start-geopoint question
 	/// in a form, all will have the same value.
 	///
-	case startGeopoint = "start-geopoint"
+	case startGeopoint
 
-	/// Sim serial
+	/// SIM serial
 	///
 	/// Only available in ODK metadata types ?
 	///
-	case simSerial = "simserial"
+	case simSerial
+
+	/// Subscriber ID
+	///
+	case subscriberid
+	@available(*, deprecated, renamed: "subscriberid")
+	public static let subscriberID: Self = .subscriberID
 
 
 	// MARK: - XLSForm question types
@@ -98,14 +104,11 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 
 	/// Integer (i.e., whole number) input.
 	///
-	case integer = "integer"
+	case integer
 
-    /// Integer (i.e., whole number) input.
-    ///
-    case int = "int"
 	/// Decimal input.
 	///
-	case decimal = "decimal"
+	case decimal
 
 	/// Range input (including rating).
 	///
@@ -115,11 +118,11 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// parameters: start, end, and step in a parameters column.
 	/// The default values are 0, 10, and 1 respectively.
 	///
-	case range = "range"
+	case range
 
 	/// Free text response.
 	///
-	case text = "text"
+	case text
 
 	/// Multiple choice question; only one answer can be selected.
 	///
@@ -128,7 +131,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	///     - `select_one [list_name] [or_other]`
 	/// - Synonyms: `select one [options]`.
 	///
-	case select_one = "select_one"
+	case select_one
 	@available(*, deprecated, renamed: "select_one")
 	public static let selectOne: Self = .select_one
 
@@ -143,7 +146,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - `select_multiple pizza_toppings`
 	/// - `select_multiple pizza_toppings or_other`
 	///
-	case select_multiple = "select_multiple"
+	case select_multiple
 	@available(*, deprecated, renamed: "select_multiple")
 	public static let selectMultiple: Self = .select_multiple
 
@@ -151,84 +154,87 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	///
 	/// `select_one_from_file [file]`
 	///
-	case select_one_from_file = "select_one_from_file"
+	case select_one_from_file
 
-    /// `select_one_external [file]`
-    ///
-    case select_one_external = "select_one_external"
-    
 	/// Multiple choice from file; multiple answers can be selected.
 	///
 	/// `select_multiple_from_file [file]`
 	///
-	case select_multiple_from_file = "select_multiple_from_file"
+	case select_multiple_from_file
+
+	/// Select one external.
+	///
+	/// `select_one_external [options]`
+	///
+	case select_one_external
 
 	/// Rank question; order a list.
 	///
 	/// `rank [options]`
 	///
-	case rank = "rank"
+	case rank
 
 	/// Display a note on the screen, takes no input. Shorthand for type=text with readonly=true.
 	///
-	case note = "note"
+	case note
 
 	/// Collect a single GPS coordinate.
 	///
 	/// - Syntax: `geopoint`
 	/// - Synonyms: `location`.
 	///
-	case geopoint = "geopoint"
+	case geopoint
 
 	/// Record a line of two or more GPS coordinates.
 	///
-	case geotrace = "geotrace"
+	case geotrace
 
 	/// Record a polygon of multiple GPS coordinates; the last point is the same as the first point.
 	///
-	case geoshape = "geoshape"
+	case geoshape
 
 	/// Date input.
 	///
-	case date = "date"
+	case date
 
 	/// Time input.
 	///
-	case time = "time"
+	case time
 
 	/// Accepts a date and a time input.
 	///
-	case dateTime = "dateTime"
+	case dateTime
 
-    /// Accepts a date and a time input.
-    ///
-    case datetime = "datetime"
 	/// Take a picture or upload an image file.
 	///
 	/// - Syntax: `image`
 	/// - Synonyms: `photo`.
 	///
-	case image = "image"
+	case image
 
 	/// Take an audio recording or upload an audio file.
 	///
-	case audio = "audio"
+	case audio
+
+	/// Audio is recorded in the background while filling the form.
+	///
+	case backgroundAudio
 
 	/// Take a video recording or upload a video file.
 	///
-	case video = "video"
+	case video
 
 	/// Generic file input (txt, pdf, xls, xlsx, doc, docx, rtf, zip)
 	///
-	case file = "file"
+	case file
 
 	/// Scan a barcode, requires the barcode scanner app to be installed.
 	///
-	case barcode = "barcode"
+	case barcode
 
 	/// Perform a calculation; see the Calculation section below.
 	///
-	case calculate = "calculate"
+	case calculate
 	@available(*, deprecated, renamed: "calculate")
 	public static let calc: Self = .calculate
 
@@ -237,17 +243,17 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - Syntax: `acknowledge`.
 	/// - Synonyms: `trigger`.
 	///
-	case acknowledge = "acknowledge"
+	case acknowledge
 	@available(*, deprecated, renamed: "acknowledge")
 	public static let trigger: Self = .acknowledge
 
 	/// A field with no associated UI element which can be used to store a constant
 	///
-	case hidden = "hidden"
+	case hidden
 
 	/// Adds a reference to an external XML data file
 	///
-	case xmlExternal = "xml-external"
+	case xmlExternal
 
 
 	// MARK: - XLSForm groups
@@ -262,7 +268,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - Syntax: `begin_group`.
 	/// - Synonyms: `begin group`.
 	///
-	case begin_group = "begin_group"
+	case begin_group
 	@available(*, deprecated, renamed: "begin_group")
 	public static let beginGroup: Self = .begin_group
 
@@ -271,7 +277,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - Syntax: `end_group`.
 	/// - Synonyms: `end group`.
 	///
-	case end_group = "end_group"
+	case end_group
 	@available(*, deprecated, renamed: "end_group")
 	public static let endGroup: Self = .end_group
 
@@ -280,7 +286,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - Syntax: `begin_repeat`.
 	/// - Undocumented synonyms: `begin repeat`.
 	///
-	case begin_repeat = "begin_repeat"
+	case begin_repeat
 	@available(*, deprecated, renamed: "begin_repeat")
 	public static let beginRepeat: Self = .begin_repeat
 
@@ -289,7 +295,7 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	/// - Syntax: `end_repeat`.
 	/// - Undocumented synonyms: `end repeat`.
 	///
-	case end_repeat = "end_repeat"
+	case end_repeat
 	@available(*, deprecated, renamed: "end_repeat")
 	public static let endRepeat: Self = .end_repeat
 
@@ -300,15 +306,14 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	public static var regularQuestionTypes: [Self] {
 		[
 			.integer,
-            .int,
 			.decimal,
 			.range,
 			.text,
 			.select_one,
 			.select_multiple,
 			.select_one_from_file,
-            .select_one_external,
 			.select_multiple_from_file,
+			.select_one_external,
 			.rank,
 			.note,
 			.geopoint,
@@ -317,9 +322,9 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 			.date,
 			.time,
 			.dateTime,
-            .datetime,
 			.image,
-			.audit,
+			.audio,
+			.backgroundAudio,
 			.video,
 			.file,
 			.barcode,
@@ -342,6 +347,8 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 			.email,
 			.audit,
 			.startGeopoint,
+			.simSerial,
+			.subscriberid,
 		]
 	}
 
@@ -393,261 +400,267 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 	// MARK: - Info
 
 	public var info: ItemInfo {
-		let o: ItemInfo
-
 		switch self {
 		case .unknown:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .unknown,
 				key: "unknown"
 			)
 		case .start:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .start,
 				key: "start"
 			)
 		case .end:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .end,
 				key: "end"
 			)
 		case .today:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .today,
 				key: "today"
 			)
 		case .deviceid:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .deviceid,
 				key: "deviceid",
 				keySynonyms: ["imei"],
 				undocumentedKeySynonyms: []
 			)
 		case .phonenumber:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .phonenumber,
 				key: "phonenumber",
 				keySynonyms: ["phone_number"],
 				undocumentedKeySynonyms: []
 			)
 		case .username:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .username,
 				key: "username"
 			)
 		case .email:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .email,
 				key: "email"
 			)
 		case .audit:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .audit,
 				key: "audit"
 			)
 		case .startGeopoint:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .startGeopoint,
 				key: "start-geopoint"
 			)
 		case .simSerial:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .simSerial,
 				key: "simserial"
 			)
-		case .integer:
-			o = ItemInfo(
-				item: .integer,
-				key: "integer"
+		case .subscriberid:
+			return ItemInfo(
+				item: .subscriberid,
+				key: "subscriberid"
 			)
-        case .int:
-            o = ItemInfo(
-                item: .int,
-                key: "int"
-            )
+		case .integer:
+			return ItemInfo(
+				item: .integer,
+				key: "integer",
+				keySynonyms: [],
+				undocumentedKeySynonyms: ["int"]
+			)
 		case .decimal:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .decimal,
 				key: "decimal"
 			)
 		case .range:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .range,
 				key: "range"
 			)
 		case .text:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .text,
 				key: "text"
 			)
 		case .select_one:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .select_one,
 				key: "select_one",
 				keySynonyms: ["select one"],
 				undocumentedKeySynonyms: []
 			)
 		case .select_multiple:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .select_multiple,
 				key: "select_multiple",
 				keySynonyms: ["select multiple"],
 				undocumentedKeySynonyms: []
 			)
 		case .select_one_from_file:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .select_one_from_file,
 				key: "select_one_from_file"
 			)
-        case .select_one_external:
-            o = ItemInfo(
-                item: .select_one_external,
-                key: "select_one_external"
-            )
-        case .select_multiple_from_file:
-			o = ItemInfo(
+		case .select_multiple_from_file:
+			return ItemInfo(
 				item: .select_multiple_from_file,
 				key: "select_multiple_from_file"
 			)
+		case .select_one_external:
+			return ItemInfo(
+				item: .select_one_external,
+				key: "select_one_external"
+			)
 		case .rank:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .rank,
 				key: "rank"
 			)
 		case .note:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .note,
 				key: "note"
 			)
 		case .geopoint:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .geopoint,
 				key: "geopoint",
 				keySynonyms: ["location"],
 				undocumentedKeySynonyms: []
 			)
 		case .geotrace:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .geotrace,
 				key: "geotrace"
 			)
 		case .geoshape:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .geoshape,
 				key: "geoshape"
 			)
 		case .date:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .date,
 				key: "date"
 			)
 		case .time:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .time,
 				key: "time"
 			)
 		case .dateTime:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .dateTime,
-				key: "dateTime"
+				key: "dateTime",
+				keySynonyms: ["datetime"],
+				undocumentedKeySynonyms: []
 			)
-        case .datetime:
-            o = ItemInfo(
-                item: .datetime,
-                key: "datetime"
-            )
-        case .image:
-			o = ItemInfo(
+		case .image:
+			return ItemInfo(
 				item: .image,
 				key: "image",
 				keySynonyms: ["photo"],
 				undocumentedKeySynonyms: []
 			)
 		case .audio:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .audio,
 				key: "audio"
 			)
+		case .backgroundAudio:
+			return ItemInfo(
+				item: .backgroundAudio,
+				key: "background-audio"
+			)
 		case .video:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .video,
 				key: "video"
 			)
 		case .file:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .file,
 				key: "file"
 			)
 		case .barcode:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .barcode,
 				key: "barcode"
 			)
 		case .calculate:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .calculate,
 				key: "calculate"
 			)
 		case .acknowledge:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .acknowledge,
 				key: "acknowledge",
 				keySynonyms: ["trigger"],
 				undocumentedKeySynonyms: []
 			)
 		case .hidden:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .hidden,
 				key: "hidden"
 			)
 		case .xmlExternal:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .xmlExternal,
 				key: "xml-external"
 			)
 		case .begin_group:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .begin_group,
 				key: "begin_group",
 				keySynonyms: ["begin group"],
 				undocumentedKeySynonyms: []
 			)
 		case .end_group:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .end_group,
 				key: "end_group",
 				keySynonyms: ["end group"],
 				undocumentedKeySynonyms: []
 			)
 		case .begin_repeat:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .begin_repeat,
 				key: "begin_repeat",
 				keySynonyms: [],
 				undocumentedKeySynonyms: ["begin repeat"]
 			)
 		case .end_repeat:
-			o = ItemInfo(
+			return ItemInfo(
 				item: .end_repeat,
 				key: "end_repeat",
 				keySynonyms: [],
 				undocumentedKeySynonyms: ["end repeat"]
 			)
 		}
-
-		return o
 	}
 
 
 	// MARK: - key & keySynonyms
 
+	/// The prominent key.
 	public var key: String {
 		self.info.key
 	}
 
-	/// All key synonyms (excluding the key itself).
+	/// All key synonyms (excluding the prominent key itself).
 	public var keySynonyms: [String] {
 		self.info.allKeySynonyms
+	}
+
+	/// All possible keys (includes the prominent key and all key synonyms).
+	public var allPossibleKeys: [String] {
+		self.info.allPossibleKeys
 	}
 
 
@@ -664,8 +677,6 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 			keySynonyms: [String] = [],
 			undocumentedKeySynonyms: [String] = []
 		) {
-			if key != item.rawValue { fatalError("Error: `rawValue` must equal the specified `key`.") }
-
 			self.key = key
 			self.keySynonyms = keySynonyms
 			self.undocumentedKeySynonyms = undocumentedKeySynonyms
@@ -682,6 +693,10 @@ public enum FormQuestionType: String, Codable, CaseIterable {
 
 
 	// MARK: - init
+
+	public var rawValue: String {
+		self.key
+	}
 
 	/// Initialize from any possible key or synonym.
 	/// Note: *type-options* (e.g. `list_name`) should not be included in the input `String`.

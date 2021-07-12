@@ -396,6 +396,15 @@ final class ConvertedDocumentPage {
 								(1...1).map { _ in br() }
 							}
 						}
+					case .subscriberid:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.subscriberid) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Subscriber ID:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
 					case .integer:
 						return nodeContainer {
 							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.integer) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
@@ -405,16 +414,7 @@ final class ConvertedDocumentPage {
 								(1...1).map { _ in br() }
 							}
 						}
-                    case .int:
-                        return nodeContainer {
-                            if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.int) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-                                div(class: "faded-dd") { "Integer:" }
-                                (1...1).map { _ in br() }
-                            } else {
-                                (1...1).map { _ in br() }
-                            }
-                        }
-                    case .decimal:
+					case .decimal:
 						return nodeContainer {
 							if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.decimal) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
 								div(class: "faded-dd") { "Decimal:" }
@@ -593,18 +593,18 @@ final class ConvertedDocumentPage {
                                 (1...1).map { _ in br() }
                             }
                         }
-                    case .select_one_external:
-                        return nodeContainer {
+					case .select_multiple_from_file:
+						return nodeContainer {
+							span(class: "faded-l") { #"Question type "select_multiple_from_file" is not supported."# }
+						}
+					case .select_one_external:
+						return nodeContainer {
                             if !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.text) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
                                 div(class: "faded-dd") { "Text:" }
                                 (1...3).map { _ in br() }
                             } else {
                                 (1...1).map { _ in br() }
                             }
-                        }
-					case .select_multiple_from_file:
-						return nodeContainer {
-							span(class: "faded-l") { #"Question type "select_multiple_from_file" is not supported."# }
 						}
 					// MARK: END: select.../rank -
 					case .note:
@@ -671,18 +671,6 @@ final class ConvertedDocumentPage {
 								(1...1).map { _ in br() }
 							}
 						}
-                    case .datetime:
-                        return nodeContainer {
-                            if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.datetime) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
-                                div {
-                                    "Date: __ / __ / ____ (DD/MM/YYYY)"
-                                    br()
-                                    "Time:" + (true ? " __ : __ : __ (HH:MM:SS)" : "")
-                                }
-                            } else {
-                                (1...1).map { _ in br() }
-                            }
-                        }
 					case .image:
 						return nodeContainer {
 							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.image) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
@@ -696,6 +684,15 @@ final class ConvertedDocumentPage {
 						return nodeContainer {
 							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.audio) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
 								div(class: "faded-dd") { "Audio:" }
+								(1...2).map { _ in br() }
+							} else {
+								(1...2).map { _ in br() }
+							}
+						}
+					case .backgroundAudio:
+						return nodeContainer {
+							if resultsLayoutDisplayOptions.fillingOutSurveyMode || !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.backgroundAudio) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Background audio:" }
 								(1...2).map { _ in br() }
 							} else {
 								(1...2).map { _ in br() }
