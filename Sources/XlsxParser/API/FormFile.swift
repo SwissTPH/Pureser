@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import enum CoreXLSX.CoreXLSXError
 import struct SurveyTypes.Survey
 
 
