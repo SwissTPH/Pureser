@@ -25,6 +25,9 @@ public struct SettingsSheet {
 	}
 
 	public struct Row: Codable {
+		/// The row's reference.
+		let _reference: UInt
+
 		var formTitle: String?
 		var formID: String?
 		var version: String?
@@ -35,6 +38,8 @@ public struct SettingsSheet {
 		var submissionURL: String?
 
 		enum CodingKeys: String, CodingKey {
+			case _reference = "_reference"
+
 			case formTitle = "form_title"
 			case formID = "form_id"
 			case version = "version"
@@ -46,6 +51,8 @@ public struct SettingsSheet {
 		}
 
 		internal init(
+			_reference: UInt,
+
 			formTitle: String? = nil,
 			formID: String? = nil,
 			version: String? = nil,
@@ -55,6 +62,8 @@ public struct SettingsSheet {
 			publicKey: String? = nil,
 			submissionURL: String? = nil
 		) {
+			self._reference = _reference
+
 			self.formTitle = formTitle
 			self.formID = formID
 			self.version = version
@@ -172,6 +181,8 @@ public struct SettingsSheet {
 		let processedContentRows: [Row] = contentRows.map {
 			(row: CoreXLSX.Row) -> Row in
 			Row(
+				_reference: row.reference,
+
 				formTitle: getter.findTrimmedPlainString(in: row, by: columnReferences.formTitle),
 				formID: getter.findTrimmedPlainString(in: row, by: columnReferences.formID),
 				version: getter.findTrimmedPlainString(in: row, by: columnReferences.version),

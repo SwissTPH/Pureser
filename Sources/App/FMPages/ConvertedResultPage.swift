@@ -276,7 +276,7 @@ final class ConvertedDocumentPage {
 						span(class: "faded-d") { surveyQuestion.name }
 						span(class: "faded-l") { "]" }
 
-						if resultsLayoutDisplayOptions.displayQuestionAnswerTypeLevel > .none {
+						if resultsLayoutDisplayOptions.displayQuestionAnswerTypeLevel > .none && !(surveyQuestion.type == .unknown && [.onItems, .inListAndOnItems].contains(resultsLayoutDisplayOptions.displaySpecificWarnings)) {
 							span {
 								span(class: "faded-l") { "[" }
 								span(class: "faded-d") {
@@ -289,6 +289,40 @@ final class ConvertedDocumentPage {
 									}
 								}
 								span(class: "faded-l") { "]" }
+							}
+						}
+					}
+
+					// Question warnings.
+					if [.onItems, .inListAndOnItems].contains(resultsLayoutDisplayOptions.displaySpecificWarnings) {
+						if let warnings = surveyQuestion.warnings, !warnings.isEmpty {
+							div(class: "q-warnings-con") {
+								warnings.map { warning in nodeContainer {
+									if case .invalidQuestionTypeOptions(in: _, type: _) = warning.warningKind, case .unknown = surveyQuestion.type {
+										if resultsLayoutDisplayOptions.treatQuestionsOfUnknownTypeAsOfTextType {
+											div(class: "warning") {
+												div(class: "warning-icon") { "⚠️" }
+												div(class: "warning-content") {
+													"This question's type is invalid or unsupported \"" + surveyQuestion.typeFull + "\", so it was treated as of type \"text\"."
+												}
+											}
+										} else {
+											div(class: "warning") {
+												div(class: "warning-icon") { "⚠️" }
+												div(class: "warning-content") {
+													"This question's type is invalid or unsupported \"" + surveyQuestion.typeFull + "\"."
+												}
+											}
+										}
+									} else {
+										div(class: "warning") {
+											div(class: "warning-icon") { "⚠️" }
+											div(class: "warning-content") {
+												warning.warningDescription.onItem
+											}
+										}
+									}
+								}} // end .map & nodeContainer
 							}
 						}
 					}
@@ -307,7 +341,12 @@ final class ConvertedDocumentPage {
 					switch surveyQuestion.type {
 					case .unknown:
 						return nodeContainer {
-							span(class: "faded-l") { "Question type is unknown (" + surveyQuestion.typeFull + ")." }
+							if resultsLayoutDisplayOptions.treatQuestionsOfUnknownTypeAsOfTextType && !resultsLayoutDisplayOptions.hideTheseQuestionAnswerType.contains(.text) && !resultsLayoutDisplayOptions.displayQuestionAnswerTypeNextToQuestionID {
+								div(class: "faded-dd") { "Text:" }
+								(1...3).map { _ in br() }
+							} else {
+								(1...1).map { _ in br() }
+							}
 						}
 					case .start:
 						return nodeContainer {
@@ -1099,7 +1138,7 @@ final class ConvertedDocumentPage {
 			"""
 			div.tools {
 				margin: 5px 0px 35px;
-				padding: 10px;
+				padding: 15px 10px;
 				border: 1px solid DodgerBlue;
 				border-radius: 6px;
 
@@ -1299,6 +1338,54 @@ final class ConvertedDocumentPage {
 			.question-choice-filter-note {
 				color: #555;
 				font-size: 11pt;
+			}
+			"""
+		)
+
+		_pageCSS.append(
+			"""
+			table.form-warnings-table {
+				width: 100%;
+				margin: auto auto;
+			}
+			table.form-warnings-table th,
+			table.form-warnings-table td {
+				padding: 4px 6px;
+			}
+			table.form-warnings-table .t-section-title {
+				text-decoration: underline;
+			}
+
+			.q-warnings-con {
+				color: #555;
+				margin: 4pt auto 12pt;
+			}
+			.warning {
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: flex;
+				width: 100%;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+				padding-top: 0.1em;
+			}
+			.warning .warning-icon {
+				display: block;
+				-webkit-box-flex: 0;
+				-ms-flex: 0 0 auto;
+				flex: 0 0 auto;
+				width: auto;
+				line-height: 1.2;
+				vertical-align: middle;
+				margin-right: .6em;
+			}
+			.warning .warning-content {
+				display: block;
+				-webkit-box-flex: 1;
+				-ms-flex: 1 1 auto;
+				flex: 1 1 auto;
+				vertical-align: middle;
 			}
 			"""
 		)
@@ -1514,6 +1601,70 @@ final class ConvertedDocumentPage {
 
 								} // end if
 							} // end if
+
+							// Form warnings.
+							if let warnings = survey.warnings, !warnings.isVacant {
+								div(style: "margin: 20pt auto 0;") {
+									h3(style: "margin-block-end: 0em;") { "⚠️ Warnings:" }
+
+									table(class: "form-warnings-table") {
+										tbody {
+											if let generalWarnings = warnings.generalWarnings, !generalWarnings.isEmpty {
+												if [.inList, .inListAndOnItems].contains(resultsLayoutDisplayOptions.displaySpecificWarnings), !(warnings.specificWarnings?.isEmpty ?? true) {
+													tr {
+														td(class: "t-section-title") {
+															"General warnings"
+														}
+													}
+												}
+												generalWarnings.map { (warning: SurveyWarning) in
+													tr {
+														td(style: "text-align: left;") {
+															div(class: "warning") {
+																div(class: "warning-icon") { "⚠️" }
+																div(class: "warning-content") {
+																	warning.warningDescription.inList
+
+																	if true, let rowReference = warning.row {
+																		br()
+																		"(Worksheet \"survey\" row number: \"\(rowReference)\")"
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+											if [.inList, .inListAndOnItems].contains(resultsLayoutDisplayOptions.displaySpecificWarnings), let itemSpecificWarnings = warnings.specificWarnings, !itemSpecificWarnings.isEmpty {
+												if !(warnings.generalWarnings?.isEmpty ?? true) {
+													tr {
+														td(class: "t-section-title") {
+															"Specific warnings"
+														}
+													}
+												}
+												itemSpecificWarnings.map { (warning: SurveyWarning) in
+													tr {
+														td(style: "text-align: left;") {
+															div(class: "warning") {
+																div(class: "warning-icon") { "⚠️" }
+																div(class: "warning-content") {
+																	warning.warningDescription.inList
+
+																	if true, let rowReference = warning.row {
+																		br()
+																		"(Worksheet \"survey\" row number: \"\(rowReference)\")"
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										} // end tbody
+									} // end table
+								}
+							}
 						}
 						div(style: "text-align: center;") {
 							h3(style: "margin: 0 auto;text-decoration: underline;") { "Survey" }

@@ -13,7 +13,6 @@ import enum Vapor.HTTPStatus
 
 import enum XlsxParser.CoreXLSXError
 import enum XlsxParser.SheetsParsingError
-import enum XlsxParser.SurveyParsingError
 import enum XlsxParser.FormFileParsingError
 
 
@@ -50,25 +49,6 @@ extension SheetsParsingError: AbortError {
 		switch self {
 		default:
 			return .badRequest
-		}
-	}
-}
-
-
-// MARK: - SurveyParsingError
-
-extension SurveyParsingError: AbortError {
-	public var reason: String {
-		switch self {
-		default:
-			return self.localizedDescription
-		}
-	}
-
-	public var status: HTTPStatus {
-		switch self {
-		default:
-			return .internalServerError
 		}
 	}
 }

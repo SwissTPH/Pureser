@@ -16,9 +16,6 @@ import SurveyTypes
 public struct SurveyParser {
 
 	//
-	typealias ParsingError = SurveyParsingError
-
-	//
 	private static let debug: Bool = false // Settings.debug
 
 	//
@@ -52,6 +49,15 @@ public struct SurveyParser {
 		// The survey groups cascade, last one appended is current.
 		var surveyGroups: [SurveyGroup] = []
 
+		// All parsing warnings.
+		var generalWarnings: [SurveyWarning] = []
+		var specificWarnings: [SurveyWarning] = []
+
+		//
+		func appendWarning(warning: SurveyWarning) {
+			generalWarnings.append(warning)
+		}
+
 		// For every row (except first which should be already dropped) in the sheet's rows, do:
 		// Also, all string values have already been `whitespacesAndNewlines`-trimmed.
 		for surveySheetRow: SurveySheet.Row in sheets.survey.processedContentRows {
@@ -66,9 +72,51 @@ public struct SurveyParser {
 				continue
 			}
 
+			//--------------------------------------------------
+
+			// Parsing warnings of the current item.
+			var currentItemWarnings: [SurveyWarning] = []
+
+			// Add the current items warnings to the form's warnings array
+			// before execution leaves the current block of code.
+			defer {
+				specificWarnings += currentItemWarnings
+			}
+
+			//
+			enum WarningList {
+				case generalWarnings
+				case specificWarnings
+			}
+
+			//
+			func appendWarning(to: WarningList, warning: SurveyWarning) {
+				if to == .generalWarnings {
+					generalWarnings.append(warning)
+				}
+				if to == .specificWarnings {
+					currentItemWarnings.append(warning)
+				}
+			}
+
+			//--------------------------------------------------
+
 			// Find type and typeOptions.
-			guard let typeAndOptions: FormQuestionTypeAndOptions = FormQuestionTypeAndOptions(fromString: typeFull) else {
-				throw ParsingError.invalidQuestionTypeOptions(in: typeFull)
+			let typeAndOptions: FormQuestionTypeAndOptions
+			if let _typeAndOptions: FormQuestionTypeAndOptions = FormQuestionTypeAndOptions(fromString: typeFull) {
+				typeAndOptions = _typeAndOptions
+			} else {
+				appendWarning(to: .specificWarnings, warning: SurveyWarning(
+					warningKind: SurveyWarningKind.invalidQuestionTypeOptions(
+						in: surveySheetRow.name ?? "",
+						type: typeFull),
+					row: surveySheetRow._reference,
+					formItemID: surveySheetRow.name,
+					formItemType: surveySheetRow.type
+				))
+
+				typeAndOptions =
+					.init(type: .unknown, options: .init(unknownType: typeFull))
 			}
 			let type = typeAndOptions.type
 			let typeOptions: FormQuestionTypeOptions? = typeAndOptions.options
@@ -131,24 +179,28 @@ public struct SurveyParser {
 			//
 			else if [.end_group, .end_repeat].contains(type) {
 
-				// If there is an "end group" without begin a "start group".
+				// If there is an "end group" without a "begin group".
 				if surveyGroups.isEmpty {
 					printmore(.warning, "A group ended without a group starting.")
-					throw ParsingError.aGroupEndedWithoutStarting
-				}
-
-				// Reset the groups by removing the ended group from the array. And assing the
-				// returned last element (the ended group) into `endedGroup` constant.
-				// .popLast() returns nil if the collection is empty.
-				// .removeLast() crashes if the collection is empty. It also has a discardable result.
-				let endedGroup = surveyGroups.removeLast()
-
-				// Add the ended group to either (1) survey's items array, or (2) parent-group's items array.
-				if surveyGroups.isEmpty {
-					surveyItems.append(SurveyItem.group(endedGroup))
+					appendWarning(to: .generalWarnings, warning: SurveyWarning(
+						warningKind: SurveyWarningKind.aGroupEndedWithoutStarting,
+						row: surveySheetRow._reference
+					))
 				} else {
-					surveyGroups[surveyGroups.endIndex-1].items.append(SurveyItem.group(endedGroup))
+					// Reset the groups by removing the ended group from the array. And assing the
+					// returned last element (the ended group) into `endedGroup` constant.
+					// .popLast() returns nil if the collection is empty.
+					// .removeLast() crashes if the collection is empty. It also has a discardable result.
+					let endedGroup = surveyGroups.removeLast()
+
+					// Add the ended group to either (1) survey's items array, or (2) parent-group's items array.
+					if surveyGroups.isEmpty {
+						surveyItems.append(SurveyItem.group(endedGroup))
+					} else {
+						surveyGroups[surveyGroups.endIndex-1].items.append(SurveyItem.group(endedGroup))
+					}
 				}
+
 			}
 			// MARK: - else
 			//
@@ -159,37 +211,49 @@ public struct SurveyParser {
 
 				// If it's a question which type needs answers/choices.
 				if [.select_one, .select_multiple, .rank].contains(type) {
+					if let choicesSheet: ChoicesSheet = sheets.choices {
 
-					//
-					guard let choicesSheet = sheets.choices else {
-						throw ParsingError.referenceToChoicesSheetButChoicesWorksheetNotFound(
-							inQuestion: surveySheetRow.name ?? "",
-							questionType: surveySheetRow.type ?? "")
+						// Find out the selection question's answers.
+						answers =
+							choicesSheet.processedContentRows
+							.filter { (choicesSheetRow: ChoicesSheet.Row) in
+								typeOptions?.listName == choicesSheetRow.listName
+							}
+							.map { (choicesSheetRow: ChoicesSheet.Row) in
+								//
+								let answerID = choicesSheetRow.name ?? ""
+
+								//
+								let translations: Survey.LocalizedData = choicesSheetRow.labelCluster ?? []
+
+								//
+								let answerLabel = translations
+
+								//
+								return SurveySelectionQuestionAnswer(
+									answerID: answerID,
+									answerLabel: answerLabel,
+									choiceFilters: choicesSheetRow.choiceFilters
+								)
+							}
+
+						if answers.isEmpty {
+							appendWarning(to: .specificWarnings, warning: SurveyWarning(
+								warningKind: SurveyWarningKind.referenceToChoicesSheetListButListNotFound(
+									inQuestion: surveySheetRow.name ?? "",
+									questionType: surveySheetRow.type ?? "",
+									listName: typeOptions?.listName ?? ""),
+								row: surveySheetRow._reference
+							))
+						}
+					} else {
+						appendWarning(to: .specificWarnings, warning: SurveyWarning(
+							warningKind: SurveyWarningKind.referenceToChoicesSheetButChoicesWorksheetNotFound(
+								inQuestion: surveySheetRow.name ?? "",
+								questionType: surveySheetRow.type ?? ""),
+							row: surveySheetRow._reference
+						))
 					}
-
-					// Find out the selection question's answers.
-					answers =
-						choicesSheet.processedContentRows
-						.filter { (choicesSheetRow: ChoicesSheet.Row) in
-							typeOptions?.listName == choicesSheetRow.listName
-						}
-						.map { (choicesSheetRow: ChoicesSheet.Row) in
-							//
-							let answerID = choicesSheetRow.name ?? ""
-
-							//
-							let translations: Survey.LocalizedData = choicesSheetRow.labelCluster ?? []
-
-							//
-							let answerLabel = translations
-
-							//
-							return SurveySelectionQuestionAnswer(
-								answerID: answerID,
-								answerLabel: answerLabel,
-								choiceFilters: choicesSheetRow.choiceFilters
-							)
-						}
 				}
 
 				//--------------------------------------------------
@@ -240,7 +304,9 @@ public struct SurveyParser {
 
 					relevanceUnprocessed: surveyItemRelevanceUnprocessed,
 
-					choiceFilterUnprocessed: surveySheetRow.choiceFilter
+					choiceFilterUnprocessed: surveySheetRow.choiceFilter,
+
+					warnings: currentItemWarnings
 				)
 
 				// Add the current question to either (1) survey's items array, or (2) parent-group's items array.
@@ -258,6 +324,13 @@ public struct SurveyParser {
 
 		// This `while` loop takes care of a situation that the xlsx file ends and some question groups were not closed.
 		while !surveyGroups.isEmpty {
+
+			// If there is a "begin group" without an "end group".
+			printmore(.warning, "A group started without a group ending.")
+			appendWarning(warning: SurveyWarning(
+				warningKind: SurveyWarningKind.aGroupStartedWithoutEnding,
+				row: sheets.survey.processedContentRows.last?._reference
+			))
 
 			// Reset the groups by removing the ended group from the array. And assing the
 			// returned last element (the ended group) into `endedGroup` constant.
@@ -344,7 +417,12 @@ public struct SurveyParser {
 
 			languagesAvailable: sheets.languagesAvailable,
 
-			items: surveyItems
+			items: surveyItems,
+
+			warnings: .init(
+				generalWarnings: !generalWarnings.isEmpty ? generalWarnings : nil,
+				specificWarnings: !specificWarnings.isEmpty ? specificWarnings : nil
+			)
 		)
 
 		return survey

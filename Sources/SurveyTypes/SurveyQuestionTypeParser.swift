@@ -33,13 +33,15 @@ extension FormQuestionTypeAndOptions {
 }
 
 //
+//@available(*, unavailable)
 extension FormQuestionTypeAndOptions: ExpressibleByStringLiteral {
 
+	@available(*, deprecated)
 	public init(stringLiteral value: String) {
 		if let x = try? parseFormQuestionTypeAndOptions(from: value) {
 			self = x
 		} else {
-			self.init(type: .unknown, options: nil)
+			self.init(type: .unknown, options: .init(unknownType: value))
 		}
 	}
 }

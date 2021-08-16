@@ -107,6 +107,13 @@ public struct Survey: Codable {
 	//
 	public var items: [SurveyItem]
 
+	//
+	public var warnings: Survey.Warnings? {
+		didSet {
+			self.warnings = self.warnings?.nilIfVacant
+		}
+	}
+
 
 	public init(
 		formTitle: String?,
@@ -120,7 +127,9 @@ public struct Survey: Codable {
 
 		languagesAvailable: Survey.LanguagesAvailable,
 
-		items: [SurveyItem]
+		items: [SurveyItem],
+
+		warnings: Survey.Warnings? = nil
 	) {
 		self.formTitle = formTitle
 		self.formID = formID
@@ -134,6 +143,8 @@ public struct Survey: Codable {
 		self.languagesAvailable = languagesAvailable
 
 		self.items = items
+
+		self.warnings = warnings?.nilIfVacant
 	}
 
 	//--------------------------------------------------
@@ -185,6 +196,48 @@ extension Survey {
 		case pages = "pages"
 		case themeGrid = "theme-grid"
 		case themeFormhub = "theme-formhub"
+	}
+
+	public struct Warnings: Codable {
+
+		/// Warnings that are general and apply to the form as a whole.
+		public var generalWarnings: [SurveyWarning]?
+
+		/// Warnings that correspond to items (i.e. questions and groups).
+		public var specificWarnings: [SurveyWarning]?
+
+
+		public init(
+			generalWarnings: [SurveyWarning]? = nil,
+			specificWarnings: [SurveyWarning]? = nil
+		) {
+			self.generalWarnings = generalWarnings
+			self.specificWarnings = specificWarnings
+		}
+
+
+		//
+		public var isVacant: Bool {
+			self.generalWarnings?.isEmpty ?? true
+				&& self.specificWarnings?.isEmpty ?? true
+		}
+
+		//
+		fileprivate var nilIfVacant: Self? {
+			var s = self
+			if s.generalWarnings?.isEmpty ?? true {
+				s.generalWarnings = nil
+			}
+			if s.specificWarnings?.isEmpty ?? true {
+				s.specificWarnings = nil
+			}
+
+			if s.isVacant {
+				return nil
+			} else {
+				return s
+			}
+		}
 	}
 
 }

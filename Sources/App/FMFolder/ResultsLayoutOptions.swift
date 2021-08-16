@@ -81,6 +81,16 @@ struct ResultsLayoutDisplayOptions {
 
 	/// The control for the display of question's and answers' choice filter related information.
 	let displayChoiceFilter: DisplayQuestionAndAnswerChoiceFilter
+    
+    //--------------------------------------------------
+
+    /// Whether to treat questions of unknown type as of text type.
+    let treatQuestionsOfUnknownTypeAsOfTextType: Bool
+
+    /// The control for the display of specific warnings.
+    ///
+    /// Note: general warnings are not affected by this and will continue to display in the combined list.
+    let displaySpecificWarnings: DisplaySpecificWarnings
 
 }
 
@@ -157,6 +167,20 @@ extension ResultsLayoutDisplayOptions {
 		/// Will display detailed question's and answers' choice filter related information.
 		case detailed
 	}
+    
+    /// The control options for the display of specific warnings.
+    ///
+    enum DisplaySpecificWarnings: Equatable {
+        /// Will display warnings only in the single combined list.
+        case inList
+
+        /// Will display warnings only on the corresponding items.
+        case onItems
+
+        /// Will display warnings both in the single combined list
+        /// and on the corresponding items.
+        case inListAndOnItems
+    }
 
 }
 
@@ -186,7 +210,10 @@ extension ResultsLayoutDisplayOptions {
 			skipQuestionWithType: [],
 			skipQuestionsWithPatternC: false,
 
-			displayChoiceFilter: .detailed
+			displayChoiceFilter: .detailed,
+            
+            treatQuestionsOfUnknownTypeAsOfTextType: true,
+            displaySpecificWarnings: .inListAndOnItems
 		)
 
 		static var dataManager = ResultsLayoutDisplayOptions(
@@ -210,7 +237,10 @@ extension ResultsLayoutDisplayOptions {
             skipQuestionWithType: [.calculate],
 			skipQuestionsWithPatternC: true,
 
-			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10)
+			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10),
+            
+            treatQuestionsOfUnknownTypeAsOfTextType: true,
+            displaySpecificWarnings: .inListAndOnItems
 		)
 
 		static var interviewer = ResultsLayoutDisplayOptions(
@@ -234,7 +264,10 @@ extension ResultsLayoutDisplayOptions {
 			skipQuestionWithType: [.calc],
 			skipQuestionsWithPatternC: true,
 
-			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10)
+			displayChoiceFilter: .upToLimitOtherwiseTextField(limit: 10),
+            
+            treatQuestionsOfUnknownTypeAsOfTextType: true,
+            displaySpecificWarnings: .inListAndOnItems
 		)
 
 	}

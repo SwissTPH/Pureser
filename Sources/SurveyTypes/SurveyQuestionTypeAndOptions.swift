@@ -26,6 +26,10 @@ extension FormQuestionTypeAndOptions: Equatable { }
 
 extension FormQuestionTypeAndOptions: CustomStringConvertible {
 	public var description: String {
+		guard self.type != .unknown else {
+			return self.options?.unknownType ?? self.type.rawValue
+		}
+
 		var o: String = self.type.rawValue
 
 		if type.isQuestionTypeWithOptions {
@@ -47,6 +51,17 @@ extension FormQuestionTypeAndOptions: CustomStringConvertible {
 
 //
 public struct FormQuestionTypeOptions: Codable {
+
+	/// The unknown question type string.
+	///
+	/// Applicable to question types (i.e. `case`s of `FormQuestionType` `enum`):
+	/// - `.unknown`
+	///
+	/// Examples (unprocessed question's type => the value):
+	/// - `unknown_type_1` ➡️ `unknownType = "unknown_type_1"`
+	/// - `unknown_type_2 option_1 option_2` ➡️ `unknownType = "unknown_type_2 option_1 option_2"`
+	///
+	public var unknownType: String?
 
 	/// The list name of the choices.
 	///
@@ -108,10 +123,12 @@ public struct FormQuestionTypeOptions: Codable {
 	public var file: String?
 
 	public init(
+		unknownType: String? = nil,
 		listName: String? = nil,
 		orOther: Bool? = nil,
 		file: String? = nil
 	) {
+		self.unknownType = unknownType
 		self.listName = listName
 		self.orOther = orOther
 		self.file = file

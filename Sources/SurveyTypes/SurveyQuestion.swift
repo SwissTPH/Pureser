@@ -56,6 +56,13 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
 	public var choiceFilterUnprocessed: String?
 
+	public var warnings: [SurveyWarning]? {
+		didSet {
+			self.warnings = !(self.warnings?.isEmpty ?? true) ? self.warnings : nil
+		}
+	}
+
+
 	public init(
 		typeAndOptions: FormQuestionTypeAndOptions,
 		typeFull: String,
@@ -72,7 +79,9 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil,
 
-		choiceFilterUnprocessed: String?
+		choiceFilterUnprocessed: String?,
+
+		warnings: [SurveyWarning]? = nil
 	) {
 		self.typeAndOptions = typeAndOptions
 		self.typeFull = typeFull
@@ -91,6 +100,7 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 
 		self.choiceFilterUnprocessed = choiceFilterUnprocessed
 
+		self.warnings = !(warnings?.isEmpty ?? true) ? warnings : nil
 	}
 
 }

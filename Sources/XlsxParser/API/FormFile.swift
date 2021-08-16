@@ -94,9 +94,6 @@ public struct FormFile {
 		let survey: Survey
 		do {
 			survey = try SurveyParser.parseIntoSurvey(using: sheets)
-		} catch let e as SurveyParsingError {
-			// print(e)
-			throw e
 		} catch {
 			// print(error)
 			// throw error

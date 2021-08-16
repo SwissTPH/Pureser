@@ -21,12 +21,17 @@ public struct ChoicesSheet {
 	}
 
 	public struct Row: Codable {
+		/// The row's reference.
+		let _reference: UInt
+
 		var listName: String?
 		var name: String?
 		var labelCluster: Survey.LocalizedData?
 		var choiceFilters: [ChoiceFilter]?
 
 		enum CodingKeys: String, CodingKey {
+			case _reference = "_reference"
+
 			case listName = "list_name"
 			case name = "name"
 			case labelCluster = "label"
@@ -34,11 +39,15 @@ public struct ChoicesSheet {
 		}
 
 		internal init(
+			_reference: UInt,
+
 			listName: String? = nil,
 			name: String? = nil,
 			labelCluster: Survey.LocalizedData? = nil,
 			choiceFilters: [ChoiceFilter]? = nil
 		) {
+			self._reference = _reference
+
 			self.listName = listName
 			self.name = name
 			self.labelCluster = labelCluster
@@ -183,6 +192,8 @@ public struct ChoicesSheet {
 		let processedContentRows: [Row] = contentRows.map {
 			(row: CoreXLSX.Row) -> Row in
 			Row(
+				_reference: row.reference,
+
 				listName: getter.findTrimmedPlainString(in: row, by: columnReferences.listName),
 				name: getter.findTrimmedPlainString(in: row, by: columnReferences.name),
 				labelCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.labelCluster),

@@ -31,6 +31,9 @@ public struct SurveySheet {
 	}
 
 	public struct Row: Codable {
+		/// The row's reference.
+		let _reference: UInt
+
 		var type: String?
 		var name: String?
 		var labelCluster: Survey.LocalizedData?
@@ -47,6 +50,8 @@ public struct SurveySheet {
 		var choiceFilter: String?
 
 		enum CodingKeys: String, CodingKey {
+			case _reference = "_reference"
+
 			case type = "type"
 			case name = "name"
 			case labelCluster = "label"
@@ -64,6 +69,8 @@ public struct SurveySheet {
 		}
 
 		internal init(
+			_reference: UInt,
+
 			type: String? = nil,
 			name: String? = nil,
 			labelCluster: Survey.LocalizedData? = nil,
@@ -79,6 +86,8 @@ public struct SurveySheet {
 			readOnly: String? = nil,
 			choiceFilter: String? = nil
 		) {
+			self._reference = _reference
+
 			self.type = type
 			self.name = name
 			self.labelCluster = labelCluster
@@ -226,6 +235,8 @@ public struct SurveySheet {
 		let processedContentRows: [Row] = contentRows.map {
 			(row: CoreXLSX.Row) -> Row in
 			Row(
+				_reference: row.reference,
+
 				type: getter.findTrimmedPlainString(in: row, by: columnReferences.type),
 				name: getter.findTrimmedPlainString(in: row, by: columnReferences.name),
 				labelCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.labelCluster),
