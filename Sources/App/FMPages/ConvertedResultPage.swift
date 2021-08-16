@@ -96,7 +96,7 @@ final class ConvertedDocumentPage {
 
 	///
 	private var currentlyNested: Bool {
-		nestedSurveyGroups.count > 0
+		!nestedSurveyGroups.isEmpty
 	}
 
 	///
@@ -106,7 +106,7 @@ final class ConvertedDocumentPage {
 
 	///
 	private var currentlyInsideRepeatTable: Bool {
-		nestedSurveyGroups.filter { surveyGroup in surveyGroup.groupType == .repeatTable }.count > 0
+		!nestedSurveyGroups.filter { surveyGroup in surveyGroup.groupType == .repeatTable }.isEmpty
 	}
 
 	// MARK: SurveyItems helpers
@@ -272,10 +272,12 @@ final class ConvertedDocumentPage {
 
 					// Question's info, e.g. question nameID and type.
 					div {
-						span(class: "faded-l") { "[" }
-						span(class: "faded-d") { surveyQuestion.name }
-						span(class: "faded-l") { "]" }
-
+                        span {
+                            span(class: "faded-l") { "[" }
+                            span(class: "faded-d") { surveyQuestion.name }
+                            span(class: "faded-l") { "]" }
+                        }
+                        
 						if resultsLayoutDisplayOptions.displayQuestionAnswerTypeLevel > .none && !(surveyQuestion.type == .unknown && [.onItems, .inListAndOnItems].contains(resultsLayoutDisplayOptions.displaySpecificWarnings)) {
 							span {
 								span(class: "faded-l") { "[" }

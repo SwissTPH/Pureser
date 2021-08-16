@@ -130,18 +130,17 @@ struct WebAppController: RouteCollection {
 				fileChecksum: .init(fileData: fileData),
 				conversionPrintVersion: .init(uploadPageFormData.printVersion)
 			)
+
 			defer {
 				fileConversionLogEntry.conversionEndDatetime = Date()
 
 				// This is in case the code execution stops unexpectedly.
-				if fileConversionLogEntry.conversionStatus == .ongoing
-					&& fileConversionLogEntry.conversionStatus != .success {
+				if ![.success, .failure].contains(fileConversionLogEntry.conversionStatus) {
 					fileConversionLogEntry.conversionStatus = .failure
 				}
 
-				if Settings.Feature.fileConversionLog {
-					_ = fileConversionLogEntry.save(on: req.db)
-				}
+				// Save either as success or as failure.
+				_ = fileConversionLogEntry.save(on: req.db)
 			}
 
 			do {
