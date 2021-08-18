@@ -1,7 +1,7 @@
 # Pureser
 
 
-![Swift 5.2](https://img.shields.io/badge/swift-5.2-red.svg?style=flat)
+![Swift 5.4](https://img.shields.io/badge/swift-5.4-red.svg?style=flat)
 
 
 Welcome to Pureser, a fast and flexible parser for survey form files *(ODK XLSForm .xlsx files)*, written in Swift. 
