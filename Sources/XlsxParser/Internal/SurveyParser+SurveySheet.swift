@@ -19,6 +19,7 @@ public struct SurveySheet {
 		//static var labelCluster = "label"
 		//static var hintCluster = "hint"
 		//static var relevant = "relevant"
+		//static var ageGroup = "agegroup"
 		//static var required = "required"
 		//static var notes = "notes"
 		//static var appearance = "appearance"
@@ -39,6 +40,7 @@ public struct SurveySheet {
 		var labelCluster: Survey.LocalizedData?
 		var hintCluster: Survey.LocalizedData?
 		var relevant: String?
+		var ageGroup: String?
 		var required: String?
 		var notes: String?
 		var appearance: String?
@@ -57,6 +59,7 @@ public struct SurveySheet {
 			case labelCluster = "label"
 			case hintCluster = "hint"
 			case relevant = "relevant"
+			case ageGroup = "agegroup"
 			case required = "required"
 			case notes = "notes"
 			case appearance = "appearance"
@@ -76,6 +79,7 @@ public struct SurveySheet {
 			labelCluster: Survey.LocalizedData? = nil,
 			hintCluster: Survey.LocalizedData? = nil,
 			relevant: String? = nil,
+			ageGroup: String? = nil,
 			required: String? = nil,
 			notes: String? = nil,
 			appearance: String? = nil,
@@ -93,6 +97,7 @@ public struct SurveySheet {
 			self.labelCluster = labelCluster
 			self.hintCluster = hintCluster
 			self.relevant = relevant
+			self.ageGroup = ageGroup
 			self.required = required
 			self.notes = notes
 			self.appearance = appearance
@@ -110,6 +115,7 @@ public struct SurveySheet {
 				&& labelCluster?.isVacant ?? true
 				&& hintCluster?.isVacant ?? true
 				&& relevant?.isEmpty ?? true
+				&& ageGroup?.isEmpty ?? true
 				&& required?.isEmpty ?? true
 				&& notes?.isEmpty ?? true
 				&& appearance?.isEmpty ?? true
@@ -132,6 +138,7 @@ public struct SurveySheet {
 		var labelCluster: ColumnClusterReference
 		var hintCluster: ColumnClusterReference?
 		var relevant: CoreXLSX.ColumnReference?
+		var ageGroup: CoreXLSX.ColumnReference?
 		var required: CoreXLSX.ColumnReference?
 		var notes: CoreXLSX.ColumnReference?
 		var appearance: CoreXLSX.ColumnReference?
@@ -212,6 +219,8 @@ public struct SurveySheet {
 
 			relevant: try? getter.findColumnReference(Row.CodingKeys.relevant.rawValue),
 
+			ageGroup: try? getter.findColumnReference(Row.CodingKeys.ageGroup.rawValue),
+
 			required: try? getter.findColumnReference(Row.CodingKeys.required.rawValue),
 
 			notes: try? getter.findColumnReference(Row.CodingKeys.notes.rawValue),
@@ -242,6 +251,7 @@ public struct SurveySheet {
 				labelCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.labelCluster),
 				hintCluster: getter.findTrimmedPlainString(in: row, by: columnReferences.hintCluster),
 				relevant: getter.findTrimmedPlainString(in: row, by: columnReferences.relevant),
+				ageGroup: getter.findTrimmedPlainString(in: row, by: columnReferences.ageGroup),
 				required: getter.findTrimmedPlainString(in: row, by: columnReferences.required),
 				notes: getter.findTrimmedPlainString(in: row, by: columnReferences.notes),
 				appearance: getter.findTrimmedPlainString(in: row, by: columnReferences.appearance),

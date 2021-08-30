@@ -15,6 +15,8 @@ public protocol SurveyItemProtocol: Codable {
 	var relevance: Survey.LocalizedData? { get }
 	var relevanceStepByStep: [Survey.LocalizedData] { get } // for debugging
 	var relevanceUnprocessed: String? { get }
+
+	var ageGroup: QuestionAgeGroup? { get }
 }
 
 //--------------------------------------------------
@@ -65,6 +67,31 @@ extension SurveyItem: Codable {
 // MARK: - Extension [SurveyItem]
 
 extension Collection where Element == SurveyItem {
+
+	// Helper
+	private func allItemsFlatMap(surveyItem: SurveyItem) -> [SurveyItemProtocol] {
+		switch surveyItem {
+		case .group(let surveyGroup):
+			return allItemsFlatMap(surveyGroup: surveyGroup)
+		case .question(let surveyQuestion):
+			return [surveyQuestion]
+		}
+	}
+
+	// Helper
+	private func allItemsFlatMap(surveyGroup: SurveyGroup) -> [SurveyItemProtocol] {
+		surveyGroup.items.flatMap { surveyItem in
+			allItemsFlatMap(surveyItem: surveyItem)
+		}
+	}
+
+	//
+	public var allItemsFlatMap: [SurveyItemProtocol] {
+		self.flatMap { (surveyItem: Element) in
+			allItemsFlatMap(surveyItem: surveyItem)
+		}
+	}
+
 
 	///
 	private func allQuestionsFlatMapHelper(surveyItem: SurveyItem) -> [SurveyQuestion] {

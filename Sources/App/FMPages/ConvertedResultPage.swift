@@ -16,6 +16,9 @@ final class ConvertedDocumentPage {
 	//
 	private var survey: Survey
 	//
+	private var hasAgeGroups: Bool
+
+	//
 	private var uploadPageFormData: UploadPageFormData?
 
 	//
@@ -36,6 +39,9 @@ final class ConvertedDocumentPage {
 
 		//
 		self.survey = survey
+		//
+		self.hasAgeGroups = survey.hasAgeGroups
+
 		//
 		self.uploadPageFormData = uploadPageFormData
 
@@ -138,8 +144,13 @@ final class ConvertedDocumentPage {
 
 		let defualtRepeatCount: Int = 5
 
+		let ageGroupAttribute: [String: String] =
+			self.hasAgeGroups && surveyGroup.ageGroup != nil
+			? ["data-agegroup": surveyGroup.ageGroup!.key]
+			: [:]
+
 		return nodeContainer {
-			div(class: "survey-group") {
+			div(class: "survey-group", customAttributes: ageGroupAttribute) {
 				if resultsLayoutDisplayOptions.displayGroupsID || resultsLayoutDisplayOptions.displayGroupsTitle {
 					div(style: "margin-top: 25px;text-align: center;") {
 						// for debugging:
@@ -153,9 +164,19 @@ final class ConvertedDocumentPage {
 						// Group's label
 						div {
 							if resultsLayoutDisplayOptions.displayGroupsID {
-								span(class: "faded-l") { "[" }
-								span(class: "faded-d") { surveyGroup.name ?? Placeholders.untitledGroupName }
-								span(class: "faded-l") { "]" }
+								span {
+									span(class: "faded-l") { "[" }
+									span(class: "faded-d") { surveyGroup.name ?? Placeholders.untitledGroupName }
+									span(class: "faded-l") { "]" }
+								}
+							}
+
+							if self.hasAgeGroups, let ageGroup = surveyGroup.ageGroup {
+								span {
+									span(class: "faded-l") { "[ Age group: " }
+									span(class: "faded-d") { ageGroup.key }
+									span(class: "faded-l") { "]" }
+								}
 							}
 
 							if resultsLayoutDisplayOptions.displayGroupsTitle {
@@ -245,8 +266,13 @@ final class ConvertedDocumentPage {
 			return []
 		}
 
+		let ageGroupAttribute: [String: String] =
+			self.hasAgeGroups && surveyQuestion.ageGroup != nil
+			? ["data-agegroup": surveyQuestion.ageGroup!.key]
+			: [:]
+
 		return nodeContainer {
-			div(class: "survey-question") {
+			div(class: "survey-question", customAttributes: ageGroupAttribute) {
 				div(style: "margin-bottom: 10px;") {
 					// for debugging:
 					if Settings.Debug.SurveyLocalizedData.surveyQuestionLabel || resultsLayoutDisplayOptions.displayOriginalQuestionLabelForDebugging {
@@ -290,6 +316,14 @@ final class ConvertedDocumentPage {
 										%(surveyQuestion.typeOptions?.orOther ?? false ? " or_other" : "")
 									}
 								}
+								span(class: "faded-l") { "]" }
+							}
+						}
+
+						if self.hasAgeGroups, let ageGroup = surveyQuestion.ageGroup {
+							span {
+								span(class: "faded-l") { "[ Age group: " }
+								span(class: "faded-d") { ageGroup.key }
 								span(class: "faded-l") { "]" }
 							}
 						}
@@ -1433,9 +1467,7 @@ final class ConvertedDocumentPage {
 
 
 					script {
-						"""
-						window.onload = function () {
-
+						let js_ol_1 = """
 							function select_survey_language_func() {
 
 								var selectedValue = this.value;
@@ -1463,13 +1495,9 @@ final class ConvertedDocumentPage {
 							if (typeof(selectEl) != 'undefined' && selectEl != null) {
 								selectEl.addEventListener('change', select_survey_language_func);
 							}
-
-						"""
-						+
-
-						(!Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster ?
 						"""
 
+						let js_ol_2 = !Settings.SurveyLocalizedData.onlyCommonLanguagesForLabelCluster ? """
 							function select_survey_language_sheet1_label_func() {
 
 								var selectedValue = this.value;
@@ -1526,12 +1554,77 @@ final class ConvertedDocumentPage {
 							if (typeof(selectEl) != 'undefined' && selectEl != null) {
 								selectEl.addEventListener('change', select_survey_language_sheet2_label_func);
 							}
+						""" : ""
 
-						"""
-						: "")
+						let js_ol_3 = self.hasAgeGroups ? """
+							const checkbox_agegroup_all     = document.getElementById("checkbox_agegroup_all");
+							const checkbox_agegroup_neonate = document.getElementById("checkbox_agegroup_neonate");
+							const checkbox_agegroup_child   = document.getElementById("checkbox_agegroup_child");
+							const checkbox_agegroup_adult   = document.getElementById("checkbox_agegroup_adult");
 
-						+
-						"""
+							function select_survey_agegroup_func(e) {
+
+								// Start by hiding all, except for "ALL" which is always shown.
+								var agegroups = {
+									ALL: true,
+									N: false,
+									N_C: false,
+									C: false,
+									C_A: false,
+									A: false,
+								};
+
+								if (checkbox_agegroup_all.checked) {
+									agegroups.ALL = true;
+								}
+								if (checkbox_agegroup_neonate.checked) {
+									agegroups.N = true;
+									agegroups.N_C = true;
+								}
+								if (checkbox_agegroup_child.checked) {
+									agegroups.N_C = true;
+									agegroups.C = true;
+									agegroups.C_A = true;
+								}
+								if (checkbox_agegroup_adult.checked) {
+									agegroups.C_A = true;
+									agegroups.A = true;
+								}
+
+								for(var key in agegroups) {
+									var value = agegroups[key];
+
+									document.querySelectorAll('[data-agegroup="' + key + '"]').forEach(function(el) {
+										el.style.display = value ? 'block' : 'none';
+									});
+								}
+
+								return;
+							}
+
+							if (typeof(checkbox_agegroup_all) != 'undefined' && checkbox_agegroup_all != null) {
+								checkbox_agegroup_all.addEventListener('change', select_survey_agegroup_func);
+							}
+							if (typeof(checkbox_agegroup_neonate) != 'undefined' && checkbox_agegroup_neonate != null) {
+								checkbox_agegroup_neonate.addEventListener('change', select_survey_agegroup_func);
+							}
+							if (typeof(checkbox_agegroup_child) != 'undefined' && checkbox_agegroup_child != null) {
+								checkbox_agegroup_child.addEventListener('change', select_survey_agegroup_func);
+							}
+							if (typeof(checkbox_agegroup_adult) != 'undefined' && checkbox_agegroup_adult != null) {
+								checkbox_agegroup_adult.addEventListener('change', select_survey_agegroup_func);
+							}
+						""" : ""
+
+						let js_ol = [js_ol_1, js_ol_2, js_ol_3]
+							.filter { !$0.isEmpty }
+							.joined(separator: "\n")
+
+						return """
+						window.onload = function () {
+
+						\(js_ol)
+
 						}
 						"""
 					}
@@ -1602,6 +1695,35 @@ final class ConvertedDocumentPage {
 									}
 
 								} // end if
+							} // end if
+
+							// Age group selection.
+							if self.hasAgeGroups {
+								div(style: "margin-top: 20px;") {
+									span(style: "text-decoration: underline;") { "Filter by age groups:" }
+									span { "&nbsp;" }
+									span {
+										label(title: "Questions pertinent to all age groups are always shown.") {
+											input(checked: true, disabled: true, id: "checkbox_agegroup_all", name: nil, readonly: true, style: nil, title: nil, type: "checkbox", value: nil)
+											"All age groups"
+										}
+										span { "&nbsp;" }
+										label {
+											input(checked: true, disabled: false, id: "checkbox_agegroup_neonate", name: nil, readonly: false, style: nil, title: nil, type: "checkbox", value: nil)
+											"Neonate"
+										}
+										span { "&nbsp;" }
+										label {
+											input(checked: true, disabled: false, id: "checkbox_agegroup_child", name: nil, readonly: false, style: nil, title: nil, type: "checkbox", value: nil)
+											"Child"
+										}
+										span { "&nbsp;" }
+										label {
+											input(checked: true, disabled: false, id: "checkbox_agegroup_adult", name: nil, readonly: false, style: nil, title: nil, type: "checkbox", value: nil)
+											"Adult"
+										}
+									}
+								}
 							} // end if
 
 							// Form warnings.

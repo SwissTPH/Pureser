@@ -140,6 +140,32 @@ public struct SurveyParser {
 
 			//--------------------------------------------------
 
+			//
+			let surveyItemAgeGroupUnprocessed: String? = surveySheetRow.ageGroup
+			//
+			let surveyItemAgeGroup: QuestionAgeGroup?
+			//
+			if let surveyItemAgeGroupUnprocessed = surveyItemAgeGroupUnprocessed, !surveyItemAgeGroupUnprocessed.isEmpty {
+				if let _surveyItemAgeGroup: QuestionAgeGroup = QuestionAgeGroup(surveyItemAgeGroupUnprocessed) {
+					surveyItemAgeGroup = _surveyItemAgeGroup
+				} else {
+					appendWarning(to: .specificWarnings, warning: SurveyWarning(
+						warningKind: SurveyWarningKind.invalidQuestionAgeGroup(
+							in: surveySheetRow.name ?? "",
+							agegroup: surveyItemAgeGroupUnprocessed),
+						row: surveySheetRow._reference,
+						formItemID: surveySheetRow.name,
+						formItemType: surveySheetRow.type
+					))
+
+					surveyItemAgeGroup = nil
+				}
+			} else {
+				surveyItemAgeGroup = nil
+			}
+
+			//--------------------------------------------------
+
 			// MARK: - if begin group
 			//
 			if [.begin_group, .begin_repeat].contains(type) {
@@ -170,6 +196,8 @@ public struct SurveyParser {
 					label: surveyGroupLabel,
 
 					relevanceUnprocessed: surveyItemRelevanceUnprocessed,
+
+					ageGroup: surveyItemAgeGroup,
 
 					items: []
 				)
@@ -303,6 +331,8 @@ public struct SurveyParser {
 					hint: surveyQuestionHint,
 
 					relevanceUnprocessed: surveyItemRelevanceUnprocessed,
+
+					ageGroup: surveyItemAgeGroup,
 
 					choiceFilterUnprocessed: surveySheetRow.choiceFilter,
 

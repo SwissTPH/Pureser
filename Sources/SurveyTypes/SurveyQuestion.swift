@@ -43,6 +43,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 	public var relevanceStepByStep: [Survey.LocalizedData] // for debugging
 	public var relevanceUnprocessed: String?
 
+	public var ageGroup: QuestionAgeGroup?
+
 	//public var `required`
 	//public var notes
 	//public var appearance
@@ -79,6 +81,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil,
 
+		ageGroup: QuestionAgeGroup? = nil,
+
 		choiceFilterUnprocessed: String?,
 
 		warnings: [SurveyWarning]? = nil
@@ -97,6 +101,8 @@ public struct SurveyQuestion: Codable, SurveyItemProtocol {
 		self.relevance = relevance
 		self.relevanceStepByStep = relevanceStepByStep
 		self.relevanceUnprocessed = relevanceUnprocessed
+
+		self.ageGroup = ageGroup
 
 		self.choiceFilterUnprocessed = choiceFilterUnprocessed
 

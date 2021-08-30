@@ -19,6 +19,8 @@ public struct SurveyGroup: Codable, SurveyItemProtocol {
 	public var relevanceStepByStep: [Survey.LocalizedData] // for debugging
 	public var relevanceUnprocessed: String?
 
+	public var ageGroup: QuestionAgeGroup?
+
 	public var items: [SurveyItem]
 
 
@@ -32,6 +34,8 @@ public struct SurveyGroup: Codable, SurveyItemProtocol {
 		relevanceStepByStep: [Survey.LocalizedData] = [],
 		relevanceUnprocessed: String? = nil,
 
+		ageGroup: QuestionAgeGroup? = nil,
+
 		items: [SurveyItem]
 	) {
 		self.groupType = groupType
@@ -42,6 +46,8 @@ public struct SurveyGroup: Codable, SurveyItemProtocol {
 		self.relevance = relevance
 		self.relevanceStepByStep = relevanceStepByStep
 		self.relevanceUnprocessed = relevanceUnprocessed
+
+		self.ageGroup = ageGroup
 
 		self.items = items
 	}

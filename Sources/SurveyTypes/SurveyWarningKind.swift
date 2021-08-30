@@ -23,6 +23,8 @@ public enum SurveyWarningKind: Codable, CustomStringConvertible {
 
 	case invalidQuestionTypeOptions(in: String, type: String)
 
+	case invalidQuestionAgeGroup(in: String, agegroup: String)
+
 	//--------------------------------------------------
 
 	private var _description: String {
@@ -42,6 +44,9 @@ public enum SurveyWarningKind: Codable, CustomStringConvertible {
 
 		case .invalidQuestionTypeOptions(in: let `in`, type: let type):
 			return #"Invalid or unsupported question type (name: "\#(`in`)", type: "\#(type)")."#
+
+		case .invalidQuestionAgeGroup(in: let `in`, agegroup: let agegroup):
+			return #"Invalid or unsupported question/group "agegroup" value (name: "\#(`in`)", agegroup: "\#(agegroup)")."#
 
 		}
 	}
@@ -73,6 +78,7 @@ extension SurveyWarningKind {
 		case referenceToChoicesSheetButChoicesWorksheetNotFound
 		case referenceToChoicesSheetListButListNotFound
 		case invalidQuestionTypeOptions
+		case invalidQuestionAgeGroup
 	}
 
 	// contains keys for all associated values of the respective `case`
@@ -92,6 +98,12 @@ extension SurveyWarningKind {
 	private enum CodingKeys_invalidQuestionTypeOptions: CodingKey {
 		case `in`
 		case type
+	}
+
+	// contains keys for all associated values of the respective `case`
+	private enum CodingKeys_invalidQuestionAgeGroup: CodingKey {
+		case `in`
+		case agegroup
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -128,6 +140,14 @@ extension SurveyWarningKind {
 			)
 			try nestedContainer.encode(`in`, forKey: .in)
 			try nestedContainer.encode(type, forKey: .type)
+
+		case let .invalidQuestionAgeGroup(in: `in`, agegroup: agegroup):
+			var nestedContainer = container.nestedContainer(
+				keyedBy: CodingKeys_invalidQuestionAgeGroup.self,
+				forKey: .invalidQuestionAgeGroup
+			)
+			try nestedContainer.encode(`in`, forKey: .in)
+			try nestedContainer.encode(agegroup, forKey: .agegroup)
 
 		}
 	}
@@ -180,6 +200,16 @@ extension SurveyWarningKind {
 				type: try nestedContainer.decode(String.self, forKey: .type)
 			)
 
+		case .invalidQuestionAgeGroup:
+			let nestedContainer = try container.nestedContainer(
+				keyedBy: CodingKeys_invalidQuestionAgeGroup.self,
+				forKey: .invalidQuestionAgeGroup
+			)
+			self = .invalidQuestionAgeGroup(
+				in: try nestedContainer.decode(String.self, forKey: .in),
+				agegroup: try nestedContainer.decode(String.self, forKey: .agegroup)
+			)
+
 		}
 	}
 
@@ -215,6 +245,11 @@ extension SurveyWarningKind {
 			return .init(
 				inList: self.localizedDescription,
 				onItem: #"This question has an invalid or unsupported type."#
+			)
+		case .invalidQuestionAgeGroup(in: _, agegroup: let agegroup):
+			return .init(
+				inList: self.localizedDescription,
+				onItem: #"This question/group has an invalid or unsupported "agegroup" value (agegroup: "\#(agegroup)")."#
 			)
 		}
 	}

@@ -242,4 +242,16 @@ extension Survey {
 
 }
 
+extension Survey {
+
+    /// Whether any of this survey's groups and questions have "agegroup" data.
+    public var hasAgeGroups: Bool {
+        self.items.allItemsFlatMap
+            .contains { item in
+                item.ageGroup != nil
+            }
+    }
+
+}
+
 //--------------------------------------------------
